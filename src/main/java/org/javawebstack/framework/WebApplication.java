@@ -1,13 +1,13 @@
 package org.javawebstack.framework;
 
 import com.github.javafaker.Faker;
-import eu.bebendorf.ajorm.wrapper.MySQL;
-import eu.bebendorf.ajorm.wrapper.SQL;
-import eu.bebendorf.ajorm.wrapper.SQLite;
-import eu.bebendorf.ajwf.WebService;
-import eu.bebendorf.ajwf.inject.Injector;
-import eu.bebendorf.ajwf.inject.SimpleInjector;
 import org.javawebstack.framework.config.Config;
+import org.javawebstack.httpserver.WebService;
+import org.javawebstack.httpserver.inject.Injector;
+import org.javawebstack.httpserver.inject.SimpleInjector;
+import org.javawebstack.orm.wrapper.MySQL;
+import org.javawebstack.orm.wrapper.SQL;
+import org.javawebstack.orm.wrapper.SQLite;
 
 public abstract class WebApplication {
 

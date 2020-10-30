@@ -1,6 +1,6 @@
 package org.javawebstack.framework;
 
-import eu.bebendorf.ajwf.transformer.route.RouteParamTransformer;
+import org.javawebstack.httpserver.transformer.route.RouteParamTransformer;
 
 public class ModelBindingParamTransformer extends RouteParamTransformer {
 
