@@ -49,7 +49,7 @@ public class Config {
         return Integer.parseInt(value);
     }
 
-    public boolean is(String key, boolean defaultValue){
+    public boolean isEnabled(String key, boolean defaultValue){
         String value = get(key);
         if(value == null)
             return defaultValue;
@@ -58,8 +58,8 @@ public class Config {
         return false;
     }
 
-    public boolean is(String key){
-        return is(key, false);
+    public boolean isEnabled(String key){
+        return isEnabled(key, false);
     }
 
     public boolean has(String key){

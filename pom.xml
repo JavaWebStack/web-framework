@@ -19,12 +19,12 @@
         <dependency>
             <groupId>com.github.JavaWebStack</groupId>
             <artifactId>ORM</artifactId>
-            <version>824e15a472</version>
+            <version>f9b9f572a4</version>
         </dependency>
         <dependency>
             <groupId>com.github.JavaWebStack</groupId>
             <artifactId>HTTP-Server</artifactId>
-            <version>5b6dfe16f9</version>
+            <version>c572626536</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
