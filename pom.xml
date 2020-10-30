@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.github.JavaWebStack</groupId>
             <artifactId>ORM</artifactId>
-            <version>f9b9f572a4</version>
+            <version>44895d0a3f</version>
         </dependency>
         <dependency>
             <groupId>com.github.JavaWebStack</groupId>
