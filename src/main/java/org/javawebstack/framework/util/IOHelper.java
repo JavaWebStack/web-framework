@@ -39,4 +39,11 @@ public class IOHelper {
         stream.close();
     }
 
+    public static void connect(InputStream in, OutputStream out) throws IOException {
+        int r;
+        byte[] buffer = new byte[1024];
+        while ((r = in.read(buffer)) != -1)
+            out.write(buffer, 0, r);
+    }
+
 }

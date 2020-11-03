@@ -6,25 +6,25 @@
 
     <groupId>org.javawebstack</groupId>
     <artifactId>Web-Framework</artifactId>
-    <version>1.0</version>
+    <version>1.0-SNAPSHOT</version>
 
     <repositories>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>javawebstack</id>
+            <url>https://repo.javawebstack.org</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>com.github.JavaWebStack</groupId>
+            <groupId>org.javawebstack</groupId>
             <artifactId>ORM</artifactId>
-            <version>44895d0a3f</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.github.JavaWebStack</groupId>
+            <groupId>org.javawebstack</groupId>
             <artifactId>HTTP-Server</artifactId>
-            <version>c572626536</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -48,7 +48,31 @@
                     <target>8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>javawebstack-snapshots</id>
+            <url>https://nexus.javawebstack.org/repository/javawebstack-snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>javawebstack-releases</id>
+            <url>https://nexus.javawebstack.org/repository/javawebstack-releases</url>
+        </repository>
+    </distributionManagement>
 
 </project>
