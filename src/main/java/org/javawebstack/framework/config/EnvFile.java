@@ -13,4 +13,8 @@ public class EnvFile extends PropertiesFile {
         });
     }
 
+    public EnvFile(String file) {
+        this(new File(file));
+    }
+
 }
