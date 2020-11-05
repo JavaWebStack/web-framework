@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JsonHelper {
+public class Json {
 
     public static Map<String, String> toKeyValueMap(JsonElement element){
         if(element == null || element.isJsonNull())

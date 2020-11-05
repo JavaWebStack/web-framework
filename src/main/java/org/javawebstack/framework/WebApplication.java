@@ -4,7 +4,7 @@ import com.github.javafaker.Faker;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.util.CORSPolicy;
-import org.javawebstack.httpserver.WebService;
+import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.inject.Injector;
 import org.javawebstack.httpserver.inject.SimpleInjector;
 import org.javawebstack.httpserver.transformer.response.JsonResponseTransformer;
@@ -14,7 +14,7 @@ import org.javawebstack.orm.wrapper.SQLite;
 
 public abstract class WebApplication {
 
-    private final WebService service;
+    private final HTTPServer server;
     private final SimpleInjector injector;
     private final Faker faker = new Faker();
     private final Config config = new Config();
@@ -44,21 +44,21 @@ public abstract class WebApplication {
             setupModels(sql);
         }
         setupInjection(injector);
-        service = new WebService()
+        server = new HTTPServer()
                 .port(config.getInt("http.server.port", 80));
-        injector.setInstance(WebService.class, service);
-        service.injector(injector);
+        injector.setInstance(HTTPServer.class, server);
+        server.injector(injector);
         injector.inject(this);
-        service.beforeInterceptor(new CORSPolicy(config.get("http.server.cors", "*")));
+        server.beforeInterceptor(new CORSPolicy(config.get("http.server.cors", "*")));
         if(config.isEnabled("http.server.json", true))
-            service.responseTransformer(new JsonResponseTransformer().ignoreStrings());
+            server.responseTransformer(new JsonResponseTransformer().ignoreStrings());
         if(sql != null)
-            service.routeParamTransformer(new ModelBindParamTransformer());
-        setupService(service);
+            server.routeParamTransformer(new ModelBindParamTransformer());
+        setupServer(server);
     }
 
-    public WebService getService() {
-        return service;
+    public HTTPServer getServer() {
+        return server;
     }
 
     public SimpleInjector getInjector() {
@@ -76,11 +76,11 @@ public abstract class WebApplication {
     public abstract void setupConfig(Config config);
     public abstract void setupInjection(SimpleInjector injector);
     public abstract void setupModels(SQL sql);
-    public abstract void setupService(WebService service);
+    public abstract void setupServer(HTTPServer server);
 
     public void run(){
-        service.start();
-        service.join();
+        server.start();
+        server.join();
     }
 
 }
