@@ -3,6 +3,7 @@ package org.javawebstack.framework;
 import com.github.javafaker.Faker;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.config.Config;
+import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.util.CORSPolicy;
 import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.inject.Injector;
@@ -12,12 +13,17 @@ import org.javawebstack.orm.wrapper.MySQL;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLite;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class WebApplication {
 
+    private final SQL sql;
     private final HTTPServer server;
     private final SimpleInjector injector;
     private final Faker faker = new Faker();
     private final Config config = new Config();
+    private final List<Module> modules = new ArrayList<>();
 
     public WebApplication(){
         injector = new SimpleInjector();
@@ -27,13 +33,13 @@ public abstract class WebApplication {
         injector.setInstance(Config.class, config);
         injector.setInstanceUnsafe(getClass(), this);
         injector.setInstance(WebApplication.class, this);
+        setupModules();
+        modules.forEach(m -> m.beforeSetupConfig(this, config));
         setupConfig(config);
-        SQL sql = null;
+        modules.forEach(m -> m.setupConfig(this, config));
         if(config.get("database.driver", "none").equalsIgnoreCase("sqlite")){
             sql = new SQLite(config.get("database.file", "db.sqlite"));
-            setupModels(sql);
-        }
-        if(config.get("database.driver", "none").equalsIgnoreCase("mysql")){
+        }else if(config.get("database.driver", "none").equalsIgnoreCase("mysql")){
             sql = new MySQL(
                     config.get("database.host", "localhost"),
                     config.getInt("database.port", 3306),
@@ -41,9 +47,17 @@ public abstract class WebApplication {
                     config.get("database.user", "root"),
                     config.get("database.password", "")
             );
-            setupModels(sql);
+        }else{
+            sql = null;
         }
+        if(sql != null){
+            modules.forEach(m -> m.beforeSetupModels(this, sql));
+            setupModels(sql);
+            modules.forEach(m -> m.setupModels(this, sql));
+        }
+        modules.forEach(m -> m.beforeSetupInjection(this, injector));
         setupInjection(injector);
+        modules.forEach(m -> m.setupInjection(this, injector));
         server = new HTTPServer()
                 .port(config.getInt("http.server.port", 80));
         injector.setInstance(HTTPServer.class, server);
@@ -54,7 +68,14 @@ public abstract class WebApplication {
             server.responseTransformer(new JsonResponseTransformer().ignoreStrings());
         if(sql != null)
             server.routeParamTransformer(new ModelBindParamTransformer());
+        modules.forEach(m -> m.beforeSetupServer(this, server));
         setupServer(server);
+        modules.forEach(m -> m.setupServer(this, server));
+    }
+
+    public WebApplication addModule(Module module){
+        modules.add(module);
+        return this;
     }
 
     public HTTPServer getServer() {
@@ -73,6 +94,7 @@ public abstract class WebApplication {
         return config;
     }
 
+    public abstract void setupModules();
     public abstract void setupConfig(Config config);
     public abstract void setupInjection(SimpleInjector injector);
     public abstract void setupModels(SQL sql);
