@@ -97,7 +97,7 @@ public class IO {
 
     public static Properties readPropertyStream(InputStream stream) throws IOException {
         Properties properties = new Properties();
-        properties.load(stream);
+        properties.load(new InputStreamReader(stream, StandardCharsets.UTF_8));
         return properties;
     }
 
