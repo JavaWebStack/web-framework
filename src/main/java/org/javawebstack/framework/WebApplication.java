@@ -15,9 +15,11 @@ import org.javawebstack.orm.wrapper.SQLite;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public abstract class WebApplication {
 
+    private Logger logger = Logger.getLogger("WebApp");
     private final SQL sql;
     private final HTTPServer server;
     private final SimpleInjector injector;
@@ -76,6 +78,14 @@ public abstract class WebApplication {
     public WebApplication addModule(Module module){
         modules.add(module);
         return this;
+    }
+
+    public Logger getLogger(){
+        return logger;
+    }
+
+    public void setLogger(Logger logger){
+        this.logger = logger;
     }
 
     public HTTPServer getServer() {
