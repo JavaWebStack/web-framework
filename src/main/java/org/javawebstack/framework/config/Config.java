@@ -20,6 +20,7 @@ public class Config {
             put("DATABASE_DRIVER", "database.driver");
             put("DATABASE_FILE", "database.file");
             put("DATABASE_HOST", "database.host");
+            put("DATABASE_NAME", "database.name");
             put("DATABASE_PORT", "database.port");
             put("DATABASE_USER", "database.user");
             put("DATABASE_PASSWORD", "database.password");
@@ -166,7 +167,7 @@ public class Config {
             if(map.containsKey(key))
                 return map.get(key);
         }
-        return "env." + key.toLowerCase(Locale.ROOT);
+        return key.toLowerCase(Locale.ROOT);
     }
 
     public void set(String key, String value){
