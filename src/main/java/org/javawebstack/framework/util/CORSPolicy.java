@@ -5,7 +5,7 @@ import org.javawebstack.httpserver.handler.RequestInterceptor;
 import org.javawebstack.httpserver.helper.HttpMethod;
 
 public class CORSPolicy implements RequestInterceptor {
-    private String allowedOrigin = "*";
+    private final String allowedOrigin;
     public CORSPolicy(String allowedOrigin){
         this.allowedOrigin = allowedOrigin;
     }
