@@ -5,6 +5,7 @@ import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.util.CORSPolicy;
+import org.javawebstack.framework.util.Crypt;
 import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.inject.Injector;
 import org.javawebstack.httpserver.inject.SimpleInjector;
@@ -25,6 +26,7 @@ public abstract class WebApplication {
     private final SimpleInjector injector;
     private final Faker faker = new Faker();
     private final Config config = new Config();
+    private final Crypt crypt;
     private final List<Module> modules = new ArrayList<>();
 
     public WebApplication(){
@@ -38,6 +40,10 @@ public abstract class WebApplication {
         setupModules();
         modules.forEach(m -> m.beforeSetupConfig(this, config));
         setupConfig(config);
+
+        crypt = new Crypt(config.has("crypt.key") ? config.get("crypt.key") : Crypt.generateKey());
+        injector.setInstance(Crypt.class, crypt);
+
         modules.forEach(m -> m.setupConfig(this, config));
         if(config.get("database.driver", "none").equalsIgnoreCase("sqlite")){
             sql = new SQLite(config.get("database.file", "db.sqlite"));
