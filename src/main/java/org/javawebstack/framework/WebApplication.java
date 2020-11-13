@@ -2,6 +2,7 @@ package org.javawebstack.framework;
 
 import com.github.javafaker.Faker;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
+import org.javawebstack.framework.bind.ModelBindTransformer;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.util.CORSPolicy;
@@ -28,6 +29,7 @@ public abstract class WebApplication {
     private final Config config = new Config();
     private final Crypt crypt;
     private final List<Module> modules = new ArrayList<>();
+    private final ModelBindParamTransformer modelBindParamTransformer = new ModelBindParamTransformer();
 
     public WebApplication(){
         injector = new SimpleInjector();
@@ -75,7 +77,7 @@ public abstract class WebApplication {
         if(config.isEnabled("http.server.json", true))
             server.responseTransformer(new JsonResponseTransformer().ignoreStrings());
         if(sql != null)
-            server.routeParamTransformer(new ModelBindParamTransformer());
+            server.routeParamTransformer(modelBindParamTransformer);
         modules.forEach(m -> m.beforeSetupServer(this, server));
         setupServer(server);
         modules.forEach(m -> m.setupServer(this, server));
@@ -83,6 +85,11 @@ public abstract class WebApplication {
 
     public WebApplication addModule(Module module){
         modules.add(module);
+        return this;
+    }
+
+    public WebApplication setModelBindTransformer(ModelBindTransformer transformer){
+        modelBindParamTransformer.setTransformer(transformer);
         return this;
     }
 
@@ -108,6 +115,10 @@ public abstract class WebApplication {
 
     public Config getConfig() {
         return config;
+    }
+
+    public Crypt getCrypt(){
+        return crypt;
     }
 
     public abstract void setupModules();
