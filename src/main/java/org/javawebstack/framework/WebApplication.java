@@ -11,6 +11,7 @@ import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.transformer.response.JsonResponseTransformer;
 import org.javawebstack.injector.Injector;
 import org.javawebstack.injector.SimpleInjector;
+import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.MySQL;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLite;
@@ -61,9 +62,15 @@ public abstract class WebApplication {
             sql = null;
         }
         if(sql != null){
-            modules.forEach(m -> m.beforeSetupModels(this, sql));
-            setupModels(sql);
-            modules.forEach(m -> m.setupModels(this, sql));
+            try {
+                for(Module m : modules)
+                    m.beforeSetupModels(this, sql);
+                setupModels(sql);
+                for(Module m : modules)
+                    m.setupModels(this, sql);
+            }catch (ORMConfigurationException ex){
+                ex.printStackTrace();
+            }
         }
         modules.forEach(m -> m.beforeSetupInjection(this, injector));
         setupInjection(injector);
@@ -124,7 +131,7 @@ public abstract class WebApplication {
     public abstract void setupModules();
     public abstract void setupConfig(Config config);
     public abstract void setupInjection(SimpleInjector injector);
-    public abstract void setupModels(SQL sql);
+    public abstract void setupModels(SQL sql) throws ORMConfigurationException;
     public abstract void setupServer(HTTPServer server);
 
     public void run(){
