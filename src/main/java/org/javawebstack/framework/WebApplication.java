@@ -5,6 +5,8 @@ import org.javawebstack.command.CommandResult;
 import org.javawebstack.command.CommandSystem;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
+import org.javawebstack.framework.command.ShellCommand;
+import org.javawebstack.framework.command.StartCommand;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.util.CORSPolicy;
@@ -95,11 +97,8 @@ public abstract class WebApplication {
         modules.forEach(m -> m.setupServer(this, server));
         setupCommands(commandSystem);
         modules.forEach(m -> m.setupCommands(this, commandSystem));
-        commandSystem.addCommand("start", (args, params) -> {
-            server.start();
-            server.join();
-            return CommandResult.success();
-        });
+        commandSystem.addCommand("start", new StartCommand(this));
+        commandSystem.addCommand("sh", new ShellCommand(this));
     }
 
     public WebApplication addModule(Module module){
@@ -151,6 +150,11 @@ public abstract class WebApplication {
         if(args == null)
             args = new String[]{"start"};
         commandSystem.run(args);
+    }
+
+    public void start(){
+        server.start();
+        server.join();
     }
 
 }
