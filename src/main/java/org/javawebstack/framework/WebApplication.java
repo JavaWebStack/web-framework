@@ -1,12 +1,15 @@
 package org.javawebstack.framework;
 
 import com.github.javafaker.Faker;
+import org.javawebstack.command.CommandResult;
+import org.javawebstack.command.CommandSystem;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.util.CORSPolicy;
 import org.javawebstack.framework.util.Crypt;
+import org.javawebstack.framework.util.MultipartPolicy;
 import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.transformer.response.JsonResponseTransformer;
 import org.javawebstack.injector.Injector;
@@ -31,6 +34,7 @@ public abstract class WebApplication {
     private final Crypt crypt;
     private final List<Module> modules = new ArrayList<>();
     private final ModelBindParamTransformer modelBindParamTransformer = new ModelBindParamTransformer();
+    private final CommandSystem commandSystem = new CommandSystem();
 
     public WebApplication(){
         injector = new SimpleInjector();
@@ -81,6 +85,7 @@ public abstract class WebApplication {
         server.injector(injector);
         injector.inject(this);
         server.beforeInterceptor(new CORSPolicy(config.get("http.server.cors", "*")));
+        server.beforeInterceptor(new MultipartPolicy(config.get("http.server.tmp", null)));
         if(config.isEnabled("http.server.json", true))
             server.responseTransformer(new JsonResponseTransformer().ignoreStrings());
         if(sql != null)
@@ -88,6 +93,13 @@ public abstract class WebApplication {
         modules.forEach(m -> m.beforeSetupServer(this, server));
         setupServer(server);
         modules.forEach(m -> m.setupServer(this, server));
+        setupCommands(commandSystem);
+        modules.forEach(m -> m.setupCommands(this, commandSystem));
+        commandSystem.addCommand("start", (args, params) -> {
+            server.start();
+            server.join();
+            return CommandResult.success();
+        });
     }
 
     public WebApplication addModule(Module module){
@@ -128,15 +140,17 @@ public abstract class WebApplication {
         return crypt;
     }
 
-    public abstract void setupModules();
-    public abstract void setupConfig(Config config);
-    public abstract void setupInjection(SimpleInjector injector);
-    public abstract void setupModels(SQL sql) throws ORMConfigurationException;
-    public abstract void setupServer(HTTPServer server);
+    protected void setupModules(){}
+    protected abstract void setupConfig(Config config);
+    protected abstract void setupInjection(SimpleInjector injector);
+    protected abstract void setupModels(SQL sql) throws ORMConfigurationException;
+    protected abstract void setupServer(HTTPServer server);
+    protected abstract void setupCommands(CommandSystem system);
 
-    public void run(){
-        server.start();
-        server.join();
+    public void run(String[] args){
+        if(args == null)
+            args = new String[]{"start"};
+        commandSystem.run(args);
     }
 
 }

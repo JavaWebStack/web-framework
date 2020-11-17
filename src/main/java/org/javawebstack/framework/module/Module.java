@@ -1,5 +1,6 @@
 package org.javawebstack.framework.module;
 
+import org.javawebstack.command.CommandSystem;
 import org.javawebstack.framework.WebApplication;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.httpserver.HTTPServer;
@@ -17,5 +18,6 @@ public interface Module {
     default void setupInjection(WebApplication application, SimpleInjector injector){}
     default void setupModels(WebApplication application, SQL sql) throws ORMConfigurationException {}
     default void setupServer(WebApplication application, HTTPServer server){}
+    default void setupCommands(WebApplication application, CommandSystem system){}
 
 }

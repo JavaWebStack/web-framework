@@ -27,6 +27,8 @@ public class Config {
             put("HTTP_SERVER_PORT", "http.server.port");
             put("HTTP_SERVER_CORS", "http.server.cors");
             put("HTTP_SERVER_JSON", "http.server.json");
+            put("HTTP_SERVER_TMP", "http.server.tmp");
+            put("CRYPT_KEY", "crypt.key");
         }});
     }
 
