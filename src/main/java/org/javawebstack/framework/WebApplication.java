@@ -46,6 +46,9 @@ public abstract class WebApplication {
         injector.setInstance(Config.class, config);
         injector.setInstanceUnsafe(getClass(), this);
         injector.setInstance(WebApplication.class, this);
+        injector.setInstance(CommandSystem.class, commandSystem);
+        commandSystem.setInjector(injector);
+
         setupModules();
         modules.forEach(m -> m.beforeSetupConfig(this, config));
         setupConfig(config);
@@ -78,9 +81,11 @@ public abstract class WebApplication {
                 ex.printStackTrace();
             }
         }
+
         modules.forEach(m -> m.beforeSetupInjection(this, injector));
         setupInjection(injector);
         modules.forEach(m -> m.setupInjection(this, injector));
+
         server = new HTTPServer()
                 .port(config.getInt("http.server.port", 80));
         injector.setInstance(HTTPServer.class, server);
@@ -95,10 +100,11 @@ public abstract class WebApplication {
         modules.forEach(m -> m.beforeSetupServer(this, server));
         setupServer(server);
         modules.forEach(m -> m.setupServer(this, server));
+
         setupCommands(commandSystem);
         modules.forEach(m -> m.setupCommands(this, commandSystem));
-        commandSystem.addCommand("start", new StartCommand(this));
-        commandSystem.addCommand("sh", new ShellCommand(this));
+        commandSystem.addCommand("start", new StartCommand());
+        commandSystem.addCommand("sh", new ShellCommand());
     }
 
     public WebApplication addModule(Module module){

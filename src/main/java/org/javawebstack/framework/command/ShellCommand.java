@@ -7,6 +7,7 @@ import org.javawebstack.command.Command;
 import org.javawebstack.command.CommandResult;
 import org.javawebstack.command.CommandSystem;
 import org.javawebstack.framework.WebApplication;
+import org.javawebstack.injector.Inject;
 import org.javawebstack.orm.ORM;
 
 import java.io.InputStreamReader;
@@ -14,10 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ShellCommand implements Command {
-    private final WebApplication application;
-    public ShellCommand(WebApplication application){
-        this.application = application;
-    }
+    @Inject
+    private WebApplication application;
     public CommandResult execute(CommandSystem system, List<String> list, Map<String, List<String>> map) {
         InputStreamReader reader = new InputStreamReader(System.in);
         Interpreter interpreter = new Interpreter();
