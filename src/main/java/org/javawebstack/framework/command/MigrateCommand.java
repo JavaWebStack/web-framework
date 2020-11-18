@@ -11,11 +11,13 @@ import java.util.Map;
 public class MigrateCommand implements Command {
 
     public CommandResult execute(CommandSystem commandSystem, List<String> args, Map<String, List<String>> params) {
-        if(params.containsKey("f")){
-            // DROP TABLES
-        }
         if(params.containsKey("a")){
-            ORM.autoMigrate();
+            if(params.containsKey("d")){
+                ORM.autoDrop();
+                System.out.println("Dropped all tables!");
+                return CommandResult.success();
+            }
+            ORM.autoMigrate(params.containsKey("f"));
             System.out.println("Auto-Migration successful!");
             return CommandResult.success();
         }
