@@ -109,6 +109,7 @@ public abstract class WebApplication {
         commandSystem.addCommand("crypt", new MultiCommand()
                 .add("generate", new CryptGenerateCommand())
                 .add("encrypt", new CryptEncryptCommand())
+                .add("decrypt", new CryptDecryptCommand())
                 .add("hash", new CryptHashCommand())
         );
     }

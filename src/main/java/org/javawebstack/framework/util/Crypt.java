@@ -27,7 +27,7 @@ public class Crypt {
             KeyGenerator keyGen = KeyGenerator.getInstance("AES");
             keyGen.init(length);
             SecretKey secretKey = keyGen.generateKey();
-            return new String(secretKey.getEncoded(), StandardCharsets.UTF_8);
+            return new String(Base64.getEncoder().encode(secretKey.getEncoded()), StandardCharsets.UTF_8);
         } catch (NoSuchAlgorithmException e) {
             throw new SecurityException(e.getMessage());
         }
@@ -36,7 +36,7 @@ public class Crypt {
     private final byte[] key;
 
     public Crypt(String key){
-        this.key = key.getBytes(StandardCharsets.UTF_8);
+        this.key = Base64.getDecoder().decode(key.getBytes(StandardCharsets.UTF_8));
     }
 
     public String hash(String data){
