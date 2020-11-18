@@ -3,10 +3,10 @@ package org.javawebstack.framework;
 import com.github.javafaker.Faker;
 import org.javawebstack.command.CommandResult;
 import org.javawebstack.command.CommandSystem;
+import org.javawebstack.command.MultiCommand;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
-import org.javawebstack.framework.command.ShellCommand;
-import org.javawebstack.framework.command.StartCommand;
+import org.javawebstack.framework.command.*;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.util.CORSPolicy;
@@ -105,6 +105,12 @@ public abstract class WebApplication {
         modules.forEach(m -> m.setupCommands(this, commandSystem));
         commandSystem.addCommand("start", new StartCommand());
         commandSystem.addCommand("sh", new ShellCommand());
+        commandSystem.addCommand("migrate", new MigrateCommand());
+        commandSystem.addCommand("crypt", new MultiCommand()
+                .add("generate", new CryptGenerateCommand())
+                .add("encrypt", new CryptEncryptCommand())
+                .add("hash", new CryptHashCommand())
+        );
     }
 
     public WebApplication addModule(Module module){
