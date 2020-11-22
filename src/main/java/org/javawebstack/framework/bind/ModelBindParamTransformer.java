@@ -10,9 +10,10 @@ import java.util.UUID;
 public class ModelBindParamTransformer extends RouteParamTransformer {
 
     private ModelBindTransformer transformer;
+    private String accessorAttribName;
 
     public ModelBindParamTransformer(){
-        this.transformer = (repo, fieldName, source) -> repo.where(fieldName, source).get();
+        this.transformer = (exchange, repo, fieldName, source) -> repo.accessible(accessorAttribName == null ? null : exchange.attrib(accessorAttribName)).where(fieldName, source).get();
         for(Class<? extends Model> model : ORM.getModels()){
             ModelBind[] binds = model.getDeclaredAnnotationsByType(ModelBind.class);
             if(binds.length == 0)
@@ -21,15 +22,13 @@ public class ModelBindParamTransformer extends RouteParamTransformer {
             String fieldName = binds[0].field().length() > 0 ? binds[0].field() : repo.getInfo().getIdField();
             Class<?> fieldType = repo.getInfo().getField(fieldName).getType();
             String parent = "string";
-            if(fieldType.equals(String.class))
-                extend("string", binds[0].value(), repo::get);
             if(fieldType.equals(UUID.class))
                 parent = "uuid";
             if(fieldType.equals(Integer.class))
                 parent = "i+";
             if(fieldType.equals(Long.class))
                 parent = "l+";
-            extend(parent, binds[0].value(), source -> transformer.transform(repo, fieldName, source));
+            extend(parent, binds[0].value(), (exchange, source) -> transformer.transform(exchange, repo, fieldName, source));
         }
     }
 
@@ -37,4 +36,7 @@ public class ModelBindParamTransformer extends RouteParamTransformer {
         this.transformer = transformer;
     }
 
+    public void setAccessorAttribName(String accessorAttribName) {
+        this.accessorAttribName = accessorAttribName;
+    }
 }

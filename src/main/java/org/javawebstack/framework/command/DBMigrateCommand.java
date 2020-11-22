@@ -8,7 +8,7 @@ import org.javawebstack.orm.ORM;
 import java.util.List;
 import java.util.Map;
 
-public class MigrateCommand implements Command {
+public class DBMigrateCommand implements Command {
 
     public CommandResult execute(CommandSystem commandSystem, List<String> args, Map<String, List<String>> params) {
         if(params.containsKey("a")){

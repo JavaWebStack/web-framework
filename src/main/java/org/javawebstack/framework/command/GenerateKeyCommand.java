@@ -3,16 +3,14 @@ package org.javawebstack.framework.command;
 import org.javawebstack.command.Command;
 import org.javawebstack.command.CommandResult;
 import org.javawebstack.command.CommandSystem;
-import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.util.Crypt;
 import org.javawebstack.framework.util.IO;
-import org.javawebstack.injector.Inject;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class CryptGenerateCommand implements Command {
+public class GenerateKeyCommand implements Command {
 
     public CommandResult execute(CommandSystem commandSystem, List<String> args, Map<String, List<String>> params) {
         String[] lines;
@@ -41,7 +39,7 @@ public class CryptGenerateCommand implements Command {
         }
         try {
             IO.writeFile(".env", String.join("\n", lines));
-            System.out.println("Generated a new key!");
+            System.out.println("Key generated!");
             return CommandResult.success();
         } catch (IOException e) {
             return CommandResult.error(e);

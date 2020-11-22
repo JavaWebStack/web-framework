@@ -1,7 +1,6 @@
 package org.javawebstack.framework;
 
 import com.github.javafaker.Faker;
-import org.javawebstack.command.CommandResult;
 import org.javawebstack.command.CommandSystem;
 import org.javawebstack.command.MultiCommand;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
@@ -9,6 +8,9 @@ import org.javawebstack.framework.bind.ModelBindTransformer;
 import org.javawebstack.framework.command.*;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
+import org.javawebstack.framework.seed.FileSeeder;
+import org.javawebstack.framework.seed.MergedSeeder;
+import org.javawebstack.framework.seed.Seeder;
 import org.javawebstack.framework.util.CORSPolicy;
 import org.javawebstack.framework.util.Crypt;
 import org.javawebstack.framework.util.MultipartPolicy;
@@ -22,7 +24,9 @@ import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLite;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public abstract class WebApplication {
@@ -37,6 +41,7 @@ public abstract class WebApplication {
     private final List<Module> modules = new ArrayList<>();
     private final ModelBindParamTransformer modelBindParamTransformer = new ModelBindParamTransformer();
     private final CommandSystem commandSystem = new CommandSystem();
+    private final Map<String, Seeder> seeders = new HashMap<>();
 
     public WebApplication(){
         injector = new SimpleInjector();
@@ -105,12 +110,18 @@ public abstract class WebApplication {
         modules.forEach(m -> m.setupCommands(this, commandSystem));
         commandSystem.addCommand("start", new StartCommand());
         commandSystem.addCommand("sh", new ShellCommand());
-        commandSystem.addCommand("migrate", new MigrateCommand());
+        commandSystem.addCommand("db", new MultiCommand()
+                .add("migrate", new DBMigrateCommand())
+                .add("seed", new DBSeedCommand())
+        );
         commandSystem.addCommand("crypt", new MultiCommand()
-                .add("generate", new CryptGenerateCommand())
                 .add("encrypt", new CryptEncryptCommand())
                 .add("decrypt", new CryptDecryptCommand())
                 .add("hash", new CryptHashCommand())
+        );
+        commandSystem.addCommand("generate", new MultiCommand()
+                .add("key", new GenerateKeyCommand())
+                .add("seed", new GenerateSeedCommand())
         );
     }
 
@@ -122,6 +133,27 @@ public abstract class WebApplication {
     public WebApplication setModelBindTransformer(ModelBindTransformer transformer){
         modelBindParamTransformer.setTransformer(transformer);
         return this;
+    }
+
+    public WebApplication setAccessorAttribName(String name){
+        modelBindParamTransformer.setAccessorAttribName(name);
+        return this;
+    }
+
+    public void addSeeder(String name, Seeder... seeder){
+        if(seeder.length == 0)
+            return;
+        if(seeder.length > 1){
+            addSeeder(name, new MergedSeeder(seeder));
+            return;
+        }
+        seeders.put(name, seeder[0]);
+    }
+
+    public Seeder getSeeder(String name){
+        if(!seeders.containsKey(name))
+            seeders.put(name, new FileSeeder(this, getClass().getClassLoader(), "seeds/"+name+".json"));
+        return seeders.get(name);
     }
 
     public Logger getLogger(){
