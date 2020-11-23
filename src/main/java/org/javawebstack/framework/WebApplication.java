@@ -135,7 +135,7 @@ public abstract class WebApplication {
     }
 
     public void addSyncJobQueue(String name, int capacity, boolean defaultQueue){
-        addQueue(name, new SyncThreadedJobQueue(capacity), defaultQueue);
+        addQueue(name, new SyncThreadedJobQueue(capacity).start(), defaultQueue);
     }
 
     public void addImmediateJobQueue(String name, boolean defaultQueue){
