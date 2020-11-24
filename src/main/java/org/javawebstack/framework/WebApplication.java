@@ -225,6 +225,10 @@ public abstract class WebApplication {
         return crypt;
     }
 
+    public I18N getTranslation(){
+        return translation;
+    }
+
     protected void setupModules(){}
     protected abstract void setupConfig(Config config);
     protected void setupInjection(SimpleInjector injector){}
