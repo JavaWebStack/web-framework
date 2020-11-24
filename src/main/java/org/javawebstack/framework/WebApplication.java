@@ -129,6 +129,8 @@ public abstract class WebApplication {
     }
 
     public void addTranslation(Locale locale, ClassLoader classLoader, String resource){
+        if(!resource.endsWith(".json"))
+            resource += ".json";
         try {
             GraphElement element = GraphElement.fromJson(IO.readTextResource(classLoader, resource));
             if(element.isObject())
