@@ -12,9 +12,8 @@ import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.seed.FileSeeder;
 import org.javawebstack.framework.seed.MergedSeeder;
 import org.javawebstack.framework.seed.Seeder;
-import org.javawebstack.framework.util.CORSPolicy;
-import org.javawebstack.framework.util.Crypt;
-import org.javawebstack.framework.util.MultipartPolicy;
+import org.javawebstack.framework.util.*;
+import org.javawebstack.graph.GraphElement;
 import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.transformer.response.JsonResponseTransformer;
 import org.javawebstack.injector.Injector;
@@ -26,6 +25,7 @@ import org.javawebstack.orm.wrapper.MySQL;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLite;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -42,6 +42,7 @@ public abstract class WebApplication {
     private final ModelBindParamTransformer modelBindParamTransformer = new ModelBindParamTransformer();
     private final CommandSystem commandSystem = new CommandSystem();
     private final Map<String, Seeder> seeders = new HashMap<>();
+    private final I18N translation = new I18N();
 
     public WebApplication(){
         injector = new SimpleInjector();
@@ -52,6 +53,7 @@ public abstract class WebApplication {
         injector.setInstanceUnsafe(getClass(), this);
         injector.setInstance(WebApplication.class, this);
         injector.setInstance(CommandSystem.class, commandSystem);
+        injector.setInstance(I18N.class, translation);
         commandSystem.setInjector(injector);
 
         setupModules();
@@ -124,6 +126,20 @@ public abstract class WebApplication {
                 .add("key", new GenerateKeyCommand())
                 .add("seed", new GenerateSeedCommand())
         );
+    }
+
+    public void addTranslation(Locale locale, ClassLoader classLoader, String resource){
+        try {
+            GraphElement element = GraphElement.fromJson(IO.readTextResource(classLoader, resource));
+            if(element.isObject())
+                translation.add(locale, element.object());
+            if(element.isArray())
+                translation.add(locale, element.array());
+        } catch (IOException ignored) {}
+    }
+
+    public void addTranslation(Locale locale, String resource){
+        addTranslation(locale, ClassLoader.getSystemClassLoader(), resource);
     }
 
     public void addDatabaseJobQueue(String name, boolean defaultQueue){
