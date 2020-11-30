@@ -49,7 +49,7 @@ public class I18N {
     public void add(Locale locale, GraphObject object){
         for(String key : object.keys()){
             Map<String, Object> fields = new HashMap<>();
-            object.forEach((k, v) -> fields.put(k,  v.isNumber() ? v.number() : v.string()));
+            object.get(key).object().forEach((k, v) -> fields.put(k,  v.isNumber() ? v.number() : v.string()));
             set(locale, key, fields);
         }
     }
