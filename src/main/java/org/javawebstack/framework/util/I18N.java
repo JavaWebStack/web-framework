@@ -60,7 +60,9 @@ public class I18N {
         if(!translations.containsKey(locale))
             return new I18NString(key);
         Map<String, I18NString> strings = translations.get(locale);
-        if(!strings.containsKey(key) && locale.equals(getDefaultLocale()))
+        if(strings.containsKey(key))
+            return strings.get(key);
+        if(locale.equals(getDefaultLocale()))
             return new I18NString(key);
         strings = translations.get(getDefaultLocale());
         return strings.containsKey(key) ? strings.get(key) : new I18NString(key);
