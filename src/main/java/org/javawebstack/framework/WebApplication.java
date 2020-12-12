@@ -39,7 +39,7 @@ public abstract class WebApplication {
     private final Config config = new Config();
     private final Crypt crypt;
     private final List<Module> modules = new ArrayList<>();
-    private final ModelBindParamTransformer modelBindParamTransformer = new ModelBindParamTransformer();
+    private final ModelBindParamTransformer modelBindParamTransformer;
     private final CommandSystem commandSystem = new CommandSystem();
     private final Map<String, Seeder> seeders = new HashMap<>();
     private final I18N translation = new I18N();
@@ -88,6 +88,7 @@ public abstract class WebApplication {
                 ex.printStackTrace();
             }
         }
+        modelBindParamTransformer = new ModelBindParamTransformer();
 
         modules.forEach(m -> m.beforeSetupInjection(this, injector));
         setupInjection(injector);
