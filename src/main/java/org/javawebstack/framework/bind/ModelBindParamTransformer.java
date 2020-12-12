@@ -1,18 +1,19 @@
 package org.javawebstack.framework.bind;
 
-import org.javawebstack.httpserver.transformer.route.RouteParamTransformer;
+import org.javawebstack.httpserver.transformer.route.DefaultRouteParamTransformer;
 import org.javawebstack.orm.Model;
 import org.javawebstack.orm.ORM;
 import org.javawebstack.orm.Repo;
 
 import java.util.UUID;
 
-public class ModelBindParamTransformer extends RouteParamTransformer {
+public class ModelBindParamTransformer extends DefaultRouteParamTransformer {
 
     private ModelBindTransformer transformer;
     private String accessorAttribName;
 
     public ModelBindParamTransformer(){
+        super();
         this.transformer = (exchange, repo, fieldName, source) -> repo.accessible(accessorAttribName == null ? null : exchange.attrib(accessorAttribName)).where(fieldName, source).get();
         for(Class<? extends Model> model : ORM.getModels()){
             ModelBind[] binds = model.getDeclaredAnnotationsByType(ModelBind.class);
