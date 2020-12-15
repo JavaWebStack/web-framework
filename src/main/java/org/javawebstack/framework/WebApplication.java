@@ -185,6 +185,8 @@ public abstract class WebApplication {
     public void addSeeder(String name, Seeder... seeder){
         if(seeder.length == 0)
             return;
+        for(Seeder seed : seeder)
+            injector.inject(seed);
         if(seeder.length > 1){
             addSeeder(name, new MergedSeeder(seeder));
             return;
