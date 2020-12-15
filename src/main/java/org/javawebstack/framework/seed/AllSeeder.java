@@ -9,7 +9,10 @@ public class AllSeeder implements Seeder {
     private WebApplication app;
 
     public void seed() {
-        app.getSeeders().forEach((n,s) -> s.seed());
+        app.getSeeders().forEach((n,s) -> {
+            if(!n.equals("all"))
+                s.seed();
+        });
     }
 
 }
