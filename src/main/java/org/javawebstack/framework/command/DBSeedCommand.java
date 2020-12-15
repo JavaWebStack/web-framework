@@ -12,7 +12,7 @@ import java.util.Map;
 public class DBSeedCommand implements Command {
 
     @Inject
-    WebApplication application;
+    private WebApplication application;
 
     public CommandResult execute(CommandSystem commandSystem, List<String> args, Map<String, List<String>> params) {
         if(args.size() == 0)

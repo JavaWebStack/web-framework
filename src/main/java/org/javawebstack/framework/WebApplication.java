@@ -9,6 +9,7 @@ import org.javawebstack.framework.command.*;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.job.*;
 import org.javawebstack.framework.module.Module;
+import org.javawebstack.framework.seed.AllSeeder;
 import org.javawebstack.framework.seed.FileSeeder;
 import org.javawebstack.framework.seed.MergedSeeder;
 import org.javawebstack.framework.seed.Seeder;
@@ -62,6 +63,8 @@ public abstract class WebApplication {
 
         crypt = new Crypt(config.has("crypt.key") ? config.get("crypt.key") : Crypt.generateKey());
         injector.setInstance(Crypt.class, crypt);
+
+        addSeeder("all", new AllSeeder());
 
         modules.forEach(m -> m.setupConfig(this, config));
         if(config.get("database.driver", "none").equalsIgnoreCase("sqlite")){
@@ -127,6 +130,10 @@ public abstract class WebApplication {
                 .add("key", new GenerateKeyCommand())
                 .add("seed", new GenerateSeedCommand())
         );
+    }
+
+    public Map<String, Seeder> getSeeders(){
+        return seeders;
     }
 
     public void addTranslation(Locale locale, ClassLoader classLoader, String resource){
