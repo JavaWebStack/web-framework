@@ -112,6 +112,8 @@ public abstract class WebApplication {
         setupServer(server);
         modules.forEach(m -> m.setupServer(this, server));
 
+        setupSeeding();
+
         setupCommands(commandSystem);
         modules.forEach(m -> m.setupCommands(this, commandSystem));
         commandSystem.addCommand("start", new StartCommand());
@@ -242,6 +244,7 @@ public abstract class WebApplication {
     protected void setupModules(){}
     protected abstract void setupConfig(Config config);
     protected void setupInjection(SimpleInjector injector){}
+    protected void setupSeeding(){}
     protected abstract void setupModels(SQL sql) throws ORMConfigurationException;
     protected abstract void setupServer(HTTPServer server);
     protected abstract void setupCommands(CommandSystem system);
