@@ -112,7 +112,9 @@ public abstract class WebApplication {
         setupServer(server);
         modules.forEach(m -> m.setupServer(this, server));
 
+        modules.forEach(m -> m.beforeSetupSeeding(this));
         setupSeeding();
+        modules.forEach(m -> m.setupSeeding(this));
 
         setupCommands(commandSystem);
         modules.forEach(m -> m.setupCommands(this, commandSystem));
