@@ -64,8 +64,6 @@ public abstract class WebApplication {
         crypt = new Crypt(config.has("crypt.key") ? config.get("crypt.key") : Crypt.generateKey());
         injector.setInstance(Crypt.class, crypt);
 
-        addSeeder("all", new AllSeeder());
-
         modules.forEach(m -> m.setupConfig(this, config));
         if(config.get("database.driver", "none").equalsIgnoreCase("sqlite")){
             sql = new SQLite(config.get("database.file", "db.sqlite"));
@@ -115,6 +113,7 @@ public abstract class WebApplication {
         modules.forEach(m -> m.beforeSetupSeeding(this));
         setupSeeding();
         modules.forEach(m -> m.setupSeeding(this));
+        addSeeder("all", new AllSeeder());
 
         setupCommands(commandSystem);
         modules.forEach(m -> m.setupCommands(this, commandSystem));
@@ -254,7 +253,11 @@ public abstract class WebApplication {
     public void run(String[] args){
         if(args == null)
             args = new String[]{"start"};
-        commandSystem.run(args);
+        try {
+            commandSystem.run(args);
+        }catch (Throwable t){
+            t.printStackTrace();
+        }
     }
 
     public void start(){
