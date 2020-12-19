@@ -13,11 +13,7 @@ public class StartCommand implements Command {
     @Inject
     private WebApplication application;
     public CommandResult execute(CommandSystem commandSystem, List<String> list, Map<String, List<String>> map) {
-        try {
-            application.start();
-        }catch (Throwable throwable){
-            return CommandResult.error(throwable);
-        }
+        application.start();
         return CommandResult.success();
     }
 }
