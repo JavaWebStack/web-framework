@@ -7,10 +7,8 @@ import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
 import org.javawebstack.framework.command.*;
 import org.javawebstack.framework.config.Config;
-import org.javawebstack.framework.job.*;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.seed.AllSeeder;
-import org.javawebstack.framework.seed.FileSeeder;
 import org.javawebstack.framework.seed.MergedSeeder;
 import org.javawebstack.framework.seed.Seeder;
 import org.javawebstack.framework.util.*;
@@ -19,8 +17,6 @@ import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.transformer.response.JsonResponseTransformer;
 import org.javawebstack.injector.Injector;
 import org.javawebstack.injector.SimpleInjector;
-import org.javawebstack.orm.ORM;
-import org.javawebstack.orm.ORMConfig;
 import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.MySQL;
 import org.javawebstack.orm.wrapper.SQL;
@@ -118,7 +114,6 @@ public abstract class WebApplication {
         setupCommands(commandSystem);
         modules.forEach(m -> m.setupCommands(this, commandSystem));
         commandSystem.addCommand("start", new StartCommand());
-        commandSystem.addCommand("worker", new WorkerCommand());
         commandSystem.addCommand("sh", new ShellCommand());
         commandSystem.addCommand("db", new MultiCommand()
                 .add("migrate", new DBMigrateCommand())
@@ -131,7 +126,6 @@ public abstract class WebApplication {
         );
         commandSystem.addCommand("generate", new MultiCommand()
                 .add("key", new GenerateKeyCommand())
-                .add("seed", new GenerateSeedCommand())
         );
     }
 
@@ -153,28 +147,6 @@ public abstract class WebApplication {
 
     public void addTranslation(Locale locale, String resource){
         addTranslation(locale, ClassLoader.getSystemClassLoader(), resource);
-    }
-
-    public void addDatabaseJobQueue(String name, boolean defaultQueue){
-        addQueue(name, new DatabaseJobQueue(name), defaultQueue);
-    }
-
-    public void enableDatabaseJobs(ORMConfig config) throws ORMConfigurationException {
-        ORM.register(DatabaseQueuedJob.class, sql, config);
-    }
-
-    public void addSyncJobQueue(String name, int capacity, boolean defaultQueue){
-        addQueue(name, new SyncThreadedJobQueue(capacity).start(), defaultQueue);
-    }
-
-    public void addImmediateJobQueue(String name, boolean defaultQueue){
-        addQueue(name, new ImmidiateJobQueue(), defaultQueue);
-    }
-
-    public void addQueue(String name, JobQueue queue, boolean defaultQueue){
-        injector.setInstance(JobQueue.class, name, queue);
-        if(defaultQueue)
-            injector.setInstance(JobQueue.class, "", queue);
     }
 
     public WebApplication addModule(Module module){
@@ -205,8 +177,6 @@ public abstract class WebApplication {
     }
 
     public Seeder getSeeder(String name){
-        if(!seeders.containsKey(name))
-            seeders.put(name, new FileSeeder(this, getClass().getClassLoader(), "seeds/"+name+".json"));
         return seeders.get(name);
     }
 
@@ -263,27 +233,6 @@ public abstract class WebApplication {
     public void start(){
         server.start();
         server.join();
-    }
-
-    public void startWorker(String... queues){
-        List<WorkerJobQueue> workerQueues = new ArrayList<>();
-        for(String name : queues){
-            JobQueue queue = injector.getInstance(JobQueue.class, name);
-            if(queue == null)
-                continue;
-            if(queue instanceof WorkerJobQueue)
-                workerQueues.add((WorkerJobQueue) queue);
-        }
-        if(workerQueues.size() == 0){
-            logger.severe("No queue to process!");
-            return;
-        }
-        UUID processUUID = UUID.randomUUID();
-        logger.info("Running worker ("+processUUID.toString()+")");
-        while (true){
-            for(WorkerJobQueue queue : workerQueues)
-                queue.process(processUUID);
-        }
     }
 
 }
