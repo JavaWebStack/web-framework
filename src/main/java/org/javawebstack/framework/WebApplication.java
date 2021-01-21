@@ -1,6 +1,7 @@
 package org.javawebstack.framework;
 
 import com.github.javafaker.Faker;
+import org.javawebstack.abstractdata.AbstractElement;
 import org.javawebstack.command.CommandSystem;
 import org.javawebstack.command.MultiCommand;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
@@ -12,7 +13,6 @@ import org.javawebstack.framework.seed.AllSeeder;
 import org.javawebstack.framework.seed.MergedSeeder;
 import org.javawebstack.framework.seed.Seeder;
 import org.javawebstack.framework.util.*;
-import org.javawebstack.graph.GraphElement;
 import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.transformer.response.JsonResponseTransformer;
 import org.javawebstack.injector.Injector;
@@ -137,7 +137,7 @@ public abstract class WebApplication {
         if(!resource.endsWith(".json"))
             resource += ".json";
         try {
-            GraphElement element = GraphElement.fromJson(IO.readTextResource(classLoader, resource));
+            AbstractElement element = AbstractElement.fromJson(IO.readTextResource(classLoader, resource));
             if(element.isObject())
                 translation.add(locale, element.object());
             if(element.isArray())

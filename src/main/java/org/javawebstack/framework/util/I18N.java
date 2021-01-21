@@ -1,7 +1,7 @@
 package org.javawebstack.framework.util;
 
-import org.javawebstack.graph.GraphArray;
-import org.javawebstack.graph.GraphObject;
+import org.javawebstack.abstractdata.AbstractArray;
+import org.javawebstack.abstractdata.AbstractObject;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -32,21 +32,21 @@ public class I18N {
         set(getDefaultLocale(), key, fields);
     }
 
-    public void add(GraphArray array){
+    public void add(AbstractArray array){
         add(getDefaultLocale(), array);
     }
 
-    public void add(Locale locale, GraphArray array){
-        GraphObject object = new GraphObject();
+    public void add(Locale locale, AbstractArray array){
+        AbstractObject object = new AbstractObject();
         array.forEach(e -> object.set(e.object().get("key").string(), e));
         add(locale, object);
     }
 
-    public void add(GraphObject object){
+    public void add(AbstractObject object){
         add(getDefaultLocale(), object);
     }
 
-    public void add(Locale locale, GraphObject object){
+    public void add(Locale locale, AbstractObject object){
         for(String key : object.keys()){
             Map<String, Object> fields = new HashMap<>();
             object.get(key).object().forEach((k, v) -> fields.put(k,  v.isNumber() ? v.number() : v.string()));
