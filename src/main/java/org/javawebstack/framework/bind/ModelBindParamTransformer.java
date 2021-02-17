@@ -14,7 +14,7 @@ public class ModelBindParamTransformer extends DefaultRouteParamTransformer {
 
     public ModelBindParamTransformer(){
         super();
-        this.transformer = (exchange, repo, fieldName, source) -> repo.accessible(accessorAttribName == null ? null : exchange.attrib(accessorAttribName)).where(fieldName, source).get();
+        this.transformer = (exchange, repo, fieldName, source) -> repo.accessible(accessorAttribName == null ? null : exchange.attrib(accessorAttribName)).where(fieldName, source).first();
         for(Class<? extends Model> model : ORM.getModels()){
             ModelBind[] binds = model.getDeclaredAnnotationsByType(ModelBind.class);
             if(binds.length == 0)
