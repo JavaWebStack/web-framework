@@ -99,3 +99,8 @@ public class User extends Model {
 
 - Docs: https://javawebstack.org/framework/
 - Example Project https://github.com/javawebstack/
+
+## Community
+### JWS Modules
+- [JWS-GraphQL](https://github.com/x7airworker/JWS-GraphQL)
+### Projects built with JWS
