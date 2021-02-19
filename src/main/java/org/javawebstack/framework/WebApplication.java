@@ -41,7 +41,7 @@ public abstract class WebApplication {
     private final Map<String, Seeder> seeders = new HashMap<>();
     private final I18N translation = new I18N();
 
-    public WebApplication(){
+    public WebApplication() {
         injector = new SimpleInjector();
         injector.setInstance(Injector.class, injector);
         injector.setInstance(Faker.class, faker);
@@ -60,9 +60,9 @@ public abstract class WebApplication {
         injector.setInstance(Crypt.class, crypt);
 
         modules.forEach(m -> m.setupConfig(this, config));
-        if(config.get("database.driver", "none").equalsIgnoreCase("sqlite")){
+        if (config.get("database.driver", "none").equalsIgnoreCase("sqlite")) {
             sql = new SQLite(config.get("database.file", "db.sqlite"));
-        }else if(config.get("database.driver", "none").equalsIgnoreCase("mysql")){
+        } else if (config.get("database.driver", "none").equalsIgnoreCase("mysql")) {
             sql = new MySQL(
                     config.get("database.host", "localhost"),
                     config.getInt("database.port", 3306),
@@ -70,17 +70,17 @@ public abstract class WebApplication {
                     config.get("database.user", "root"),
                     config.get("database.password", "")
             );
-        }else{
+        } else {
             sql = null;
         }
-        if(sql != null){
+        if (sql != null) {
             try {
-                for(Module m : modules)
+                for (Module m : modules)
                     m.beforeSetupModels(this, sql);
                 setupModels(sql);
-                for(Module m : modules)
+                for (Module m : modules)
                     m.setupModels(this, sql);
-            }catch (ORMConfigurationException ex){
+            } catch (ORMConfigurationException ex) {
                 ex.printStackTrace();
             }
         }
@@ -97,9 +97,9 @@ public abstract class WebApplication {
         injector.inject(this);
         server.beforeInterceptor(new CORSPolicy(config.get("http.server.cors", "*")));
         server.beforeInterceptor(new MultipartPolicy(config.get("http.server.tmp", null)));
-        if(config.isEnabled("http.server.json", true))
+        if (config.isEnabled("http.server.json", true))
             server.responseTransformer(new JsonResponseTransformer().ignoreStrings());
-        if(sql != null)
+        if (sql != null)
             server.routeParamTransformer(modelBindParamTransformer);
         modules.forEach(m -> m.beforeSetupServer(this, server));
         setupServer(server);
@@ -128,62 +128,63 @@ public abstract class WebApplication {
         );
     }
 
-    public Map<String, Seeder> getSeeders(){
+    public Map<String, Seeder> getSeeders() {
         return seeders;
     }
 
-    public void addTranslation(Locale locale, ClassLoader classLoader, String resource){
-        if(!resource.endsWith(".json"))
+    public void addTranslation(Locale locale, ClassLoader classLoader, String resource) {
+        if (!resource.endsWith(".json"))
             resource += ".json";
         try {
             AbstractElement element = AbstractElement.fromJson(IO.readTextResource(classLoader, resource));
-            if(element.isObject())
+            if (element.isObject())
                 translation.add(locale, element.object());
-            if(element.isArray())
+            if (element.isArray())
                 translation.add(locale, element.array());
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
-    public void addTranslation(Locale locale, String resource){
+    public void addTranslation(Locale locale, String resource) {
         addTranslation(locale, ClassLoader.getSystemClassLoader(), resource);
     }
 
-    public WebApplication addModule(Module module){
+    public WebApplication addModule(Module module) {
         modules.add(module);
         return this;
     }
 
-    public WebApplication setModelBindTransformer(ModelBindTransformer transformer){
+    public WebApplication setModelBindTransformer(ModelBindTransformer transformer) {
         modelBindParamTransformer.setTransformer(transformer);
         return this;
     }
 
-    public WebApplication setAccessorAttribName(String name){
+    public WebApplication setAccessorAttribName(String name) {
         modelBindParamTransformer.setAccessorAttribName(name);
         return this;
     }
 
-    public void addSeeder(String name, Seeder... seeder){
-        if(seeder.length == 0)
+    public void addSeeder(String name, Seeder... seeder) {
+        if (seeder.length == 0)
             return;
-        for(Seeder seed : seeder)
+        for (Seeder seed : seeder)
             injector.inject(seed);
-        if(seeder.length > 1){
+        if (seeder.length > 1) {
             addSeeder(name, new MergedSeeder(seeder));
             return;
         }
         seeders.put(name, seeder[0]);
     }
 
-    public Seeder getSeeder(String name){
+    public Seeder getSeeder(String name) {
         return seeders.get(name);
     }
 
-    public Logger getLogger(){
+    public Logger getLogger() {
         return logger;
     }
 
-    public void setLogger(Logger logger){
+    public void setLogger(Logger logger) {
         this.logger = logger;
     }
 
@@ -203,33 +204,37 @@ public abstract class WebApplication {
         return config;
     }
 
-    public Crypt getCrypt(){
+    public Crypt getCrypt() {
         return crypt;
     }
 
-    public I18N getTranslation(){
+    public I18N getTranslation() {
         return translation;
     }
 
-    protected void setupModules(){}
+    protected void setupModules() {
+    }
+
     protected abstract void setupConfig(Config config);
     protected void setupInjection(Injector injector){}
     protected void setupSeeding(){}
     protected abstract void setupModels(SQL sql) throws ORMConfigurationException;
+
     protected abstract void setupServer(HTTPServer server);
+
     protected abstract void setupCommands(CommandSystem system);
 
-    public void run(String[] args){
-        if(args == null)
+    public void run(String[] args) {
+        if (args == null)
             args = new String[]{"start"};
         try {
             commandSystem.run(args);
-        }catch (Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
-    public void start(){
+    public void start() {
         server.start();
         server.join();
     }

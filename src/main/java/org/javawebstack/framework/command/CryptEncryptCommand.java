@@ -15,7 +15,7 @@ public class CryptEncryptCommand implements Command {
     Crypt crypt;
 
     public CommandResult execute(CommandSystem commandSystem, List<String> args, Map<String, List<String>> params) {
-        if(params.containsKey("l")){
+        if (params.containsKey("l")) {
             System.out.println(crypt.encryptLaravel(args.size() > 0 ? args.get(0) : ""));
             return CommandResult.success();
         }

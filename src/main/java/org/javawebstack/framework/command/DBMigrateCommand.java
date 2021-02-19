@@ -16,14 +16,14 @@ public class DBMigrateCommand implements Command {
     private WebApplication app;
 
     public CommandResult execute(CommandSystem commandSystem, List<String> args, Map<String, List<String>> params) {
-        if(params.containsKey("a")){
-            if(params.containsKey("d")){
+        if (params.containsKey("a")) {
+            if (params.containsKey("d")) {
                 ORM.autoDrop();
                 System.out.println("Dropped all tables!");
                 return CommandResult.success();
             }
             ORM.autoMigrate(params.containsKey("f"));
-            if(params.containsKey("s"))
+            if (params.containsKey("s"))
                 app.getSeeder("all").seed();
             System.out.println("Auto-Migration successful!");
             return CommandResult.success();
