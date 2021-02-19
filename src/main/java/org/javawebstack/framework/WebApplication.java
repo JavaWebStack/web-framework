@@ -31,7 +31,7 @@ public abstract class WebApplication {
     private Logger logger = Logger.getLogger("WebApp");
     private final SQL sql;
     private final HTTPServer server;
-    private final SimpleInjector injector;
+    private final Injector injector;
     private final Faker faker = new Faker();
     private final Config config = new Config();
     private final Crypt crypt;
@@ -44,10 +44,9 @@ public abstract class WebApplication {
     public WebApplication(){
         injector = new SimpleInjector();
         injector.setInstance(Injector.class, injector);
-        injector.setInstance(SimpleInjector.class, injector);
         injector.setInstance(Faker.class, faker);
         injector.setInstance(Config.class, config);
-        injector.setInstanceUnsafe(getClass(), this);
+        injector.setInstance((Class<WebApplication>) getClass(), this);
         injector.setInstance(WebApplication.class, this);
         injector.setInstance(CommandSystem.class, commandSystem);
         injector.setInstance(I18N.class, translation);
@@ -192,7 +191,7 @@ public abstract class WebApplication {
         return server;
     }
 
-    public SimpleInjector getInjector() {
+    public Injector getInjector() {
         return injector;
     }
 
@@ -214,7 +213,7 @@ public abstract class WebApplication {
 
     protected void setupModules(){}
     protected abstract void setupConfig(Config config);
-    protected void setupInjection(SimpleInjector injector){}
+    protected void setupInjection(Injector injector){}
     protected void setupSeeding(){}
     protected abstract void setupModels(SQL sql) throws ORMConfigurationException;
     protected abstract void setupServer(HTTPServer server);
