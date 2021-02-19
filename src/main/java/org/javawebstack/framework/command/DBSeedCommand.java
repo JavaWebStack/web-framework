@@ -15,9 +15,9 @@ public class DBSeedCommand implements Command {
     private WebApplication application;
 
     public CommandResult execute(CommandSystem commandSystem, List<String> args, Map<String, List<String>> params) {
-        if(args.size() == 0)
+        if (args.size() == 0)
             return CommandResult.syntax("db seed [...seeds]");
-        for(String name : args)
+        for (String name : args)
             application.getSeeder(name).seed();
         System.out.println("Seeding done!");
         return CommandResult.success();

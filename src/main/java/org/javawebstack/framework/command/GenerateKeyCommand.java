@@ -20,21 +20,21 @@ public class GenerateKeyCommand implements Command {
             lines = new String[0];
         }
         boolean found = false;
-        for(int i=0; i<lines.length; i++){
-            if(lines[i].startsWith("CRYPT_KEY=")){
-                if(lines[i].length() > 10 && !params.containsKey("f"))
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith("CRYPT_KEY=")) {
+                if (lines[i].length() > 10 && !params.containsKey("f"))
                     return CommandResult.error("You already have a key. You might loose all your encrypted data if you regenerate it! Use -f to do it anyway.");
                 lines[i] = "CRYPT_KEY=" + Crypt.generateKey();
                 found = true;
                 break;
             }
         }
-        if(!found){
+        if (!found) {
             String[] newLines = new String[lines.length + 3];
             System.arraycopy(lines, 0, newLines, 0, lines.length);
-            newLines[newLines.length-3] = "";
-            newLines[newLines.length-2] = "# Encryption Key";
-            newLines[newLines.length-1] = "CRYPT_KEY=" + Crypt.generateKey();
+            newLines[newLines.length - 3] = "";
+            newLines[newLines.length - 2] = "# Encryption Key";
+            newLines[newLines.length - 1] = "CRYPT_KEY=" + Crypt.generateKey();
             lines = newLines;
         }
         try {

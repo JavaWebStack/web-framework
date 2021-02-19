@@ -12,6 +12,7 @@ import java.util.Map;
 public class StartCommand implements Command {
     @Inject
     private WebApplication application;
+
     public CommandResult execute(CommandSystem commandSystem, List<String> list, Map<String, List<String>> map) {
         application.start();
         return CommandResult.success();
