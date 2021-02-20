@@ -1,4 +1,4 @@
-package org.javawebstack.framework.command;
+package org.javawebstack.framework.command.db;
 
 import org.javawebstack.command.Command;
 import org.javawebstack.command.CommandResult;
@@ -10,7 +10,7 @@ import org.javawebstack.orm.ORM;
 import java.util.List;
 import java.util.Map;
 
-public class DBMigrateCommand implements Command {
+public class MigrateCommand implements Command {
 
     @Inject
     private WebApplication app;

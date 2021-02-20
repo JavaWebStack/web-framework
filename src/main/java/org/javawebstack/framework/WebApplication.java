@@ -7,6 +7,12 @@ import org.javawebstack.command.MultiCommand;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
 import org.javawebstack.framework.command.*;
+import org.javawebstack.framework.command.crypto.DecryptCommand;
+import org.javawebstack.framework.command.crypto.EncryptCommand;
+import org.javawebstack.framework.command.crypto.HashCommand;
+import org.javawebstack.framework.command.crypto.GenerateKeyCommand;
+import org.javawebstack.framework.command.db.MigrateCommand;
+import org.javawebstack.framework.command.db.SeedCommand;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.seed.AllSeeder;
@@ -115,13 +121,13 @@ public abstract class WebApplication {
         commandSystem.addCommand("start", new StartCommand());
         commandSystem.addCommand("sh", new ShellCommand());
         commandSystem.addCommand("db", new MultiCommand()
-                .add("migrate", new DBMigrateCommand())
-                .add("seed", new DBSeedCommand())
+                .add("migrate", new MigrateCommand())
+                .add("seed", new SeedCommand())
         );
         commandSystem.addCommand("crypt", new MultiCommand()
-                .add("encrypt", new CryptEncryptCommand())
-                .add("decrypt", new CryptDecryptCommand())
-                .add("hash", new CryptHashCommand())
+                .add("encrypt", new EncryptCommand())
+                .add("decrypt", new DecryptCommand())
+                .add("hash", new HashCommand())
         );
         commandSystem.addCommand("generate", new MultiCommand()
                 .add("key", new GenerateKeyCommand())

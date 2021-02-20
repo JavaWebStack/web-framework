@@ -1,5 +1,6 @@
 package org.javawebstack.framework.config;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import org.javawebstack.framework.util.IO;
 import org.javawebstack.framework.util.Json;
@@ -207,6 +208,17 @@ public class Config {
         if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("1") || value.equalsIgnoreCase("yes"))
             return true;
         return false;
+    }
+
+    public String generateEnv(){
+        StringBuilder env = new StringBuilder();
+        Gson escaper = new Gson();
+        config.forEach((key, value) -> {
+            env.append(key)
+               .append("=")
+               .append(escaper.toJson(value)).append("\n");
+        });
+        return env.toString();
     }
 
     public boolean isEnabled(String key) {

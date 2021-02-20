@@ -1,4 +1,4 @@
-package org.javawebstack.framework.command;
+package org.javawebstack.framework.command.crypto;
 
 import org.javawebstack.command.Command;
 import org.javawebstack.command.CommandResult;

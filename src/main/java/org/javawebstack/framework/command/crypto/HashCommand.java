@@ -1,4 +1,4 @@
-package org.javawebstack.framework.command;
+package org.javawebstack.framework.command.crypto;
 
 import org.javawebstack.command.Command;
 import org.javawebstack.command.CommandResult;
@@ -9,7 +9,7 @@ import org.javawebstack.injector.Inject;
 import java.util.List;
 import java.util.Map;
 
-public class CryptHashCommand implements Command {
+public class HashCommand implements Command {
 
     @Inject
     Crypt crypt;
