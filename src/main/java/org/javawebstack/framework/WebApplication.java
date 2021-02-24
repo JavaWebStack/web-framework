@@ -27,6 +27,17 @@ import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.MySQL;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLite;
+import org.javawebstack.scheduler.job.JobQueue;
+import org.javawebstack.scheduler.job.JobWorker;
+import org.javawebstack.scheduler.job.local.LocalJobQueue;
+import org.javawebstack.scheduler.job.redis.RedisJobQueue;
+import org.javawebstack.scheduler.job.sql.SQLJobQueue;
+import org.javawebstack.scheduler.scheduler.Schedule;
+import org.javawebstack.scheduler.scheduler.Scheduler;
+import org.javawebstack.scheduler.scheduler.local.LocalSchedule;
+import org.javawebstack.scheduler.scheduler.redis.RedisSchedule;
+import org.javawebstack.scheduler.scheduler.sql.SQLSchedule;
+import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.*;
@@ -46,6 +57,8 @@ public abstract class WebApplication {
     private final CommandSystem commandSystem = new CommandSystem();
     private final Map<String, Seeder> seeders = new HashMap<>();
     private final I18N translation = new I18N();
+    private JobQueue jobQueue;
+    private Schedule schedule;
 
     public WebApplication() {
         injector = new SimpleInjector();
@@ -95,6 +108,26 @@ public abstract class WebApplication {
         modules.forEach(m -> m.beforeSetupInjection(this, injector));
         setupInjection(injector);
         modules.forEach(m -> m.setupInjection(this, injector));
+
+        switch (config.get("schedule.driver")) {
+            case "DATABASE":
+                jobQueue = new SQLJobQueue(sql, config.get("schedule.jobs.name", "default"));
+                schedule = new SQLSchedule(sql, config.get("schedule.jobs.name", "default"));
+                break;
+            case "REDIS":
+                jobQueue = new RedisJobQueue(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
+                schedule = new RedisSchedule(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
+                break;
+            case "LOCAL":
+            default:
+                jobQueue = new LocalJobQueue();
+                schedule = new LocalSchedule();
+                break;
+        }
+
+
+        injector.setInstance(JobQueue.class, jobQueue);
+        injector.setInstance(Schedule.class, schedule);
 
         server = new HTTPServer()
                 .port(config.getInt("http.server.port", 80));
