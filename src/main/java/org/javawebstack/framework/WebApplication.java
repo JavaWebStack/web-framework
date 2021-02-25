@@ -112,12 +112,12 @@ public abstract class WebApplication {
         setupInjection(injector);
         modules.forEach(m -> m.setupInjection(this, injector));
 
-        switch (config.get("schedule.driver")) {
+        switch (config.get("scheduler.driver")) {
             case "DATABASE":
                 Repo.get(SQLJobModel.class).autoMigrate();
                 Repo.get(SQLScheduledTaskModel.class).autoMigrate();
-                jobQueue = new SQLJobQueue(sql, config.get("schedule.jobs.name", "default"));
-                schedule = new SQLSchedule(sql, config.get("schedule.jobs.name", "default"));
+                jobQueue = new SQLJobQueue(sql, config.get("scheduler.jobs.name", "default"));
+                schedule = new SQLSchedule(sql, config.get("scheduler.jobs.name", "default"));
                 break;
             case "REDIS":
                 jobQueue = new RedisJobQueue(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
