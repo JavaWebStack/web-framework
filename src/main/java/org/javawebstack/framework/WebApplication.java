@@ -112,6 +112,9 @@ public abstract class WebApplication {
         setupInjection(injector);
         modules.forEach(m -> m.setupInjection(this, injector));
 
+        jobQueue = new LocalJobQueue();
+        schedule = new LocalSchedule();
+
         switch (config.get("scheduler.driver")) {
             case "DATABASE":
                 Repo.get(SQLJobModel.class).autoMigrate();
@@ -122,11 +125,6 @@ public abstract class WebApplication {
             case "REDIS":
                 jobQueue = new RedisJobQueue(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
                 schedule = new RedisSchedule(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
-                break;
-            case "LOCAL":
-            default:
-                jobQueue = new LocalJobQueue();
-                schedule = new LocalSchedule();
                 break;
         }
 
