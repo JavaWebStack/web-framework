@@ -115,19 +115,20 @@ public abstract class WebApplication {
         jobQueue = new LocalJobQueue();
         schedule = new LocalSchedule();
 
-        switch (config.get("scheduler.driver")) {
-            case "DATABASE":
-                Repo.get(SQLJobModel.class).autoMigrate();
-                Repo.get(SQLScheduledTaskModel.class).autoMigrate();
-                jobQueue = new SQLJobQueue(sql, config.get("scheduler.jobs.name", "default"));
-                schedule = new SQLSchedule(sql, config.get("scheduler.jobs.name", "default"));
-                break;
-            case "REDIS":
-                jobQueue = new RedisJobQueue(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
-                schedule = new RedisSchedule(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
-                break;
+        if (config.get("scheduler.driver") != null) {
+            switch (config.get("scheduler.driver")) {
+                case "DATABASE":
+                    Repo.get(SQLJobModel.class).autoMigrate();
+                    Repo.get(SQLScheduledTaskModel.class).autoMigrate();
+                    jobQueue = new SQLJobQueue(sql, config.get("scheduler.jobs.name", "default"));
+                    schedule = new SQLSchedule(sql, config.get("scheduler.jobs.name", "default"));
+                    break;
+                case "REDIS":
+                    jobQueue = new RedisJobQueue(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
+                    schedule = new RedisSchedule(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
+                    break;
+            }
         }
-
 
         injector.setInstance(JobQueue.class, jobQueue);
         injector.setInstance(Schedule.class, schedule);
