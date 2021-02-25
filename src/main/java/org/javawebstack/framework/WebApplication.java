@@ -6,11 +6,12 @@ import org.javawebstack.command.CommandSystem;
 import org.javawebstack.command.MultiCommand;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
-import org.javawebstack.framework.command.*;
+import org.javawebstack.framework.command.ShellCommand;
+import org.javawebstack.framework.command.StartCommand;
 import org.javawebstack.framework.command.crypto.DecryptCommand;
 import org.javawebstack.framework.command.crypto.EncryptCommand;
-import org.javawebstack.framework.command.crypto.HashCommand;
 import org.javawebstack.framework.command.crypto.GenerateKeyCommand;
+import org.javawebstack.framework.command.crypto.HashCommand;
 import org.javawebstack.framework.command.db.MigrateCommand;
 import org.javawebstack.framework.command.db.SeedCommand;
 import org.javawebstack.framework.config.Config;
@@ -23,20 +24,22 @@ import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.httpserver.transformer.response.JsonResponseTransformer;
 import org.javawebstack.injector.Injector;
 import org.javawebstack.injector.SimpleInjector;
+import org.javawebstack.orm.ORM;
+import org.javawebstack.orm.Repo;
 import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.MySQL;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLite;
 import org.javawebstack.scheduler.job.JobQueue;
-import org.javawebstack.scheduler.job.JobWorker;
 import org.javawebstack.scheduler.job.local.LocalJobQueue;
 import org.javawebstack.scheduler.job.redis.RedisJobQueue;
+import org.javawebstack.scheduler.job.sql.SQLJobModel;
 import org.javawebstack.scheduler.job.sql.SQLJobQueue;
 import org.javawebstack.scheduler.scheduler.Schedule;
-import org.javawebstack.scheduler.scheduler.Scheduler;
 import org.javawebstack.scheduler.scheduler.local.LocalSchedule;
 import org.javawebstack.scheduler.scheduler.redis.RedisSchedule;
 import org.javawebstack.scheduler.scheduler.sql.SQLSchedule;
+import org.javawebstack.scheduler.scheduler.sql.SQLScheduledTaskModel;
 import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
@@ -111,6 +114,8 @@ public abstract class WebApplication {
 
         switch (config.get("schedule.driver")) {
             case "DATABASE":
+                Repo.get(SQLJobModel.class).autoMigrate();
+                Repo.get(SQLScheduledTaskModel.class).autoMigrate();
                 jobQueue = new SQLJobQueue(sql, config.get("schedule.jobs.name", "default"));
                 schedule = new SQLSchedule(sql, config.get("schedule.jobs.name", "default"));
                 break;
@@ -255,8 +260,13 @@ public abstract class WebApplication {
     }
 
     protected abstract void setupConfig(Config config);
-    protected void setupInjection(Injector injector){}
-    protected void setupSeeding(){}
+
+    protected void setupInjection(Injector injector) {
+    }
+
+    protected void setupSeeding() {
+    }
+
     protected abstract void setupModels(SQL sql) throws ORMConfigurationException;
 
     protected abstract void setupServer(HTTPServer server);

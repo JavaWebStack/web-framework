@@ -210,14 +210,15 @@ public class Config {
         return false;
     }
 
-    public String generateEnv(){
+    public String generateEnv() {
         StringBuilder env = new StringBuilder();
         Gson escaper = new Gson();
         config.forEach((key, value) -> {
             env.append(key)
-               .append("=")
-               .append(escaper.toJson(value)).append("\n");
+                    .append("=")
+                    .append(escaper.toJson(value)).append("\n");
         });
+
         return env.toString();
     }
 
