@@ -14,6 +14,7 @@ import org.javawebstack.framework.command.crypto.GenerateKeyCommand;
 import org.javawebstack.framework.command.crypto.HashCommand;
 import org.javawebstack.framework.command.db.MigrateCommand;
 import org.javawebstack.framework.command.db.SeedCommand;
+import org.javawebstack.framework.command.schedule.WorkCommand;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.seed.AllSeeder;
@@ -21,10 +22,8 @@ import org.javawebstack.framework.seed.MergedSeeder;
 import org.javawebstack.framework.seed.Seeder;
 import org.javawebstack.framework.util.*;
 import org.javawebstack.httpserver.HTTPServer;
-import org.javawebstack.httpserver.transformer.response.JsonResponseTransformer;
 import org.javawebstack.injector.Injector;
 import org.javawebstack.injector.SimpleInjector;
-import org.javawebstack.orm.ORM;
 import org.javawebstack.orm.Repo;
 import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.MySQL;
@@ -140,8 +139,8 @@ public abstract class WebApplication {
         injector.inject(this);
         server.beforeInterceptor(new CORSPolicy(config.get("http.server.cors", "*")));
         server.beforeInterceptor(new MultipartPolicy(config.get("http.server.tmp", null)));
-        if (config.isEnabled("http.server.json", true))
-            server.responseTransformer(new JsonResponseTransformer().ignoreStrings());
+        if (config.isEnabled("http.server.autoserialization", true))
+            server.responseTransformer(new SerializedResponseTransformer().ignoreStrings());
         if (sql != null)
             server.routeParamTransformer(modelBindParamTransformer);
         modules.forEach(m -> m.beforeSetupServer(this, server));
@@ -168,6 +167,9 @@ public abstract class WebApplication {
         );
         commandSystem.addCommand("generate", new MultiCommand()
                 .add("key", new GenerateKeyCommand())
+        );
+        commandSystem.addCommand("schedule", new MultiCommand()
+                .add("work", new WorkCommand())
         );
     }
 
