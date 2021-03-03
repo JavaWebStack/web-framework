@@ -26,9 +26,7 @@ import org.javawebstack.injector.Injector;
 import org.javawebstack.injector.SimpleInjector;
 import org.javawebstack.orm.Repo;
 import org.javawebstack.orm.exception.ORMConfigurationException;
-import org.javawebstack.orm.wrapper.MySQL;
-import org.javawebstack.orm.wrapper.SQL;
-import org.javawebstack.orm.wrapper.SQLite;
+import org.javawebstack.orm.wrapper.*;
 import org.javawebstack.scheduler.job.JobQueue;
 import org.javawebstack.scheduler.job.local.LocalJobQueue;
 import org.javawebstack.scheduler.job.redis.RedisJobQueue;
@@ -48,7 +46,7 @@ import java.util.logging.Logger;
 public abstract class WebApplication {
 
     private Logger logger = Logger.getLogger("WebApp");
-    private final SQL sql;
+    private SQL sql;
     private final HTTPServer server;
     private final Injector injector;
     private final Faker faker = new Faker();
@@ -61,6 +59,7 @@ public abstract class WebApplication {
     private final I18N translation = new I18N();
     private JobQueue jobQueue;
     private Schedule schedule;
+    private SQLDriverFactory sqlDriverFactory;
 
     public WebApplication() {
         injector = new SimpleInjector();
@@ -81,29 +80,27 @@ public abstract class WebApplication {
         injector.setInstance(Crypt.class, crypt);
 
         modules.forEach(m -> m.setupConfig(this, config));
-        if (config.get("database.driver", "none").equalsIgnoreCase("sqlite")) {
-            sql = new SQLite(config.get("database.file", "db.sqlite"));
-        } else if (config.get("database.driver", "none").equalsIgnoreCase("mysql")) {
-            sql = new MySQL(
-                    config.get("database.host", "localhost"),
-                    config.getInt("database.port", 3306),
-                    config.get("database.name", "app"),
-                    config.get("database.user", "root"),
-                    config.get("database.password", "")
-            );
-        } else {
-            sql = null;
-        }
-        if (sql != null) {
-            try {
-                for (Module m : modules)
-                    m.beforeSetupModels(this, sql);
-                setupModels(sql);
-                for (Module m : modules)
-                    m.setupModels(this, sql);
-            } catch (ORMConfigurationException ex) {
-                ex.printStackTrace();
-            }
+        sqlDriverFactory = new SQLDriverFactory(new HashMap<String, String>() {{
+            put("file", config.get("database.file", "sb.sqlite"));
+            put("host", config.get("database.host", "localhost"));
+            put("port", config.get("database.port", "3306"));
+            put("name", config.get("database.name", "app"));
+            put("user", config.get("database.user", "root"));
+            put("password", config.get("database.password", ""));
+        }});
+        String driverName = config.get("database.driver", "none");
+        try {
+            sql = sqlDriverFactory.getDriver(driverName);
+
+            for (Module m : modules)
+                m.beforeSetupModels(this, sql);
+            setupModels(sql);
+            for (Module m : modules)
+                m.setupModels(this, sql);
+        } catch (ORMConfigurationException ex) {
+            ex.printStackTrace();
+        } catch (SQLDriverNotFoundException e) {
+            logger.warning("[SQL] Driver " + driverName + " not found!");
         }
         modelBindParamTransformer = new ModelBindParamTransformer();
 
