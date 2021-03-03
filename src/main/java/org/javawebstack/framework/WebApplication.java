@@ -88,6 +88,7 @@ public abstract class WebApplication {
             put("user", config.get("database.user", "root"));
             put("password", config.get("database.password", ""));
         }});
+        modules.forEach(m -> m.setupDriverFactory(this, sqlDriverFactory));
         String driverName = config.get("database.driver", "none");
         try {
             sql = sqlDriverFactory.getDriver(driverName);
