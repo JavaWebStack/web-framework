@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -48,11 +49,21 @@ public class Crypt {
     }
 
     public String sign(String data) {
-        return hash(new String(this.key) + data);
+        return sign(data.getBytes(StandardCharsets.UTF_8));
     }
 
-    public boolean checkSignature(String data, String signature) {
-        return check(signature, new String(this.key) + data);
+    public String sign(byte[] data) {
+        Mac sha512Hmac;
+        try {
+            sha512Hmac = Mac.getInstance("HmacSHA512");
+            SecretKeySpec keySpec = new SecretKeySpec(key, "HmacSHA512");
+            sha512Hmac.init(keySpec);
+            byte[] macData = sha512Hmac.doFinal(data);
+            return new String(Base64.getEncoder().encode(macData), StandardCharsets.UTF_8);
+        } catch (InvalidKeyException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public String encryptLaravel(String data) {
