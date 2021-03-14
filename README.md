@@ -17,8 +17,12 @@ The Web Framework combines multiple JavaWebStack libraries with glue code and he
 ## Documentation
 You can find the current docs on our [website](https://docs.javawebstack.org/framework). This is a work-in-progress project though so it's not yet complete.
 
+## JWS Modules
+- [Passport](https://github.com/javawebstack/Passport): A library for adding OAuth2 to authenticate in your Application
+
 ## Community
 ### JWS Modules
 - [JWS-GraphQL](https://github.com/x7airworker/JWS-GraphQL)
 ### Projects built with JWS
+- [Pastefy](https://github.com/interaapps/pastefy)
 - [InteraApps Passwords](https://github.com/interaapps/passwords-backend)
