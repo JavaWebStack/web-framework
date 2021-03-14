@@ -47,6 +47,14 @@ public class Crypt {
         return BCrypt.check(hash, data);
     }
 
+    public String sign(String data) {
+        return hash(new String(this.key) + data);
+    }
+
+    public boolean checkSignature(String data, String signature) {
+        return check(signature, new String(this.key) + data);
+    }
+
     public String encryptLaravel(String data) {
         return encrypt("s:" + data.length() + ":\"" + data + "\";");
     }
