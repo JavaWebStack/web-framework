@@ -5,12 +5,9 @@ import org.javawebstack.abstractdata.util.QueryString;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 public class URLUtils {
-    public String urlEncode(String content){
+    public String urlEncode(String content) {
         try {
             return URLEncoder.encode(content, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -19,7 +16,7 @@ public class URLUtils {
         return null;
     }
 
-    public String urlDecode(String content){
+    public String urlDecode(String content) {
         try {
             return URLDecoder.decode(content, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -34,12 +31,12 @@ public class URLUtils {
         private String path = "";
         private QueryString queryParameters = new QueryString();
 
-        public URLBuilder(){
+        public URLBuilder() {
 
         }
 
-        public String build(){
-            String url = protocol+"://"+domain;
+        public String build() {
+            String url = protocol + "://" + domain;
 
             url += getFullPath();
 
@@ -71,10 +68,10 @@ public class URLUtils {
         public String getFullPath() {
             String fullPath = "";
             if (!path.equals(""))
-                fullPath +=  (path.startsWith("/") ? "" : "/") + path;
+                fullPath += (path.startsWith("/") ? "" : "/") + path;
 
             if (queryParameters.size() > 0)
-                fullPath += (fullPath.contains("/") ? "" : "/") + "?"+queryParameters.toString();
+                fullPath += (fullPath.contains("/") ? "" : "/") + "?" + queryParameters.toString();
 
             return fullPath;
         }
@@ -97,7 +94,7 @@ public class URLUtils {
             return this;
         }
 
-        public URLBuilder setQueryParameter(String key, String value){
+        public URLBuilder setQueryParameter(String key, String value) {
             queryParameters.set(key, value);
             return this;
         }
@@ -106,7 +103,7 @@ public class URLUtils {
             return build();
         }
 
-        public static URLBuilder from(String url){
+        public static URLBuilder from(String url) {
             URLBuilder urlBuilder = new URLBuilder();
             String[] protocolAndUrl = url.split("://", 2);
             urlBuilder.protocol = protocolAndUrl[0];
@@ -128,4 +125,5 @@ public class URLUtils {
             return urlBuilder;
         }
     }
+
 }
