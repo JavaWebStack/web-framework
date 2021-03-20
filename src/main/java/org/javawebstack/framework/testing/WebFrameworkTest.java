@@ -16,4 +16,8 @@ public abstract class WebFrameworkTest {
     public HTTPTest getHttpTest() {
         return httpTest;
     }
+
+    public WebApplication getWebApplication() {
+        return webApplication;
+    }
 }
