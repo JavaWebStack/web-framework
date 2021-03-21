@@ -24,6 +24,7 @@ import org.javawebstack.framework.util.*;
 import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.injector.Injector;
 import org.javawebstack.injector.SimpleInjector;
+import org.javawebstack.orm.ORM;
 import org.javawebstack.orm.Repo;
 import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.SQL;
@@ -117,8 +118,13 @@ public abstract class WebApplication {
         if (config.get("scheduler.driver") != null) {
             switch (config.get("scheduler.driver")) {
                 case "DATABASE":
-                    Repo.get(SQLJobModel.class).autoMigrate();
-                    Repo.get(SQLScheduledTaskModel.class).autoMigrate();
+
+                    try {
+                        ORM.register(SQLJobModel.class, sql).autoMigrate();
+                        ORM.register(SQLScheduledTaskModel.class, sql).autoMigrate();
+                    } catch (ORMConfigurationException e) {
+                        e.printStackTrace();
+                    }
                     jobQueue = new SQLJobQueue(sql, config.get("scheduler.jobs.name", "default"));
                     schedule = new SQLSchedule(sql, config.get("scheduler.jobs.name", "default"));
                     break;
