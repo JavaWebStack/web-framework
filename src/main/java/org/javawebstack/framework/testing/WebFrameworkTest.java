@@ -17,20 +17,12 @@ public abstract class WebFrameworkTest extends HTTPTest {
         this.webApplication = webApplication;
     }
 
-    public WebApplication getWebApplication() {
+    public WebApplication getApplication() {
         return webApplication;
     }
 
     public Injector getInjector(){
         return webApplication.getInjector();
-    }
-
-    public <T> T inject(Class<T> clazz){
-        return webApplication.getInjector().getInstance(clazz);
-    }
-
-    public <T> T inject(Class<T> clazz, String name){
-        return webApplication.getInjector().getInstance(clazz, name);
     }
 
     public void seed(String name){
