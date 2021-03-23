@@ -12,6 +12,8 @@ public abstract class WebFrameworkTest extends HTTPTest {
 
     public WebFrameworkTest(WebApplication webApplication){
         super(webApplication.getServer());
+        webApplication.getInjector().inject(getClass());
+
         this.webApplication = webApplication;
     }
 
