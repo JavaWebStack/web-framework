@@ -263,6 +263,10 @@ public abstract class WebApplication {
         return translation;
     }
 
+    public CommandSystem getCommandSystem() {
+        return commandSystem;
+    }
+
     protected void setupModules() {
     }
 
