@@ -5,6 +5,8 @@ import org.javawebstack.orm.Model;
 import org.javawebstack.orm.ORM;
 import org.javawebstack.orm.Repo;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class ModelBindParamTransformer extends DefaultRouteParamTransformer {
@@ -14,7 +16,22 @@ public class ModelBindParamTransformer extends DefaultRouteParamTransformer {
 
     public ModelBindParamTransformer() {
         super();
-        this.transformer = (exchange, repo, fieldName, source) -> repo.accessible(accessorAttribName == null ? null : exchange.attrib(accessorAttribName)).where(fieldName, source).first();
+        this.transformer = (exchange, repo, fieldName, source) -> {
+            Map<Class<? extends Model>, Map<Object, Object>> cache = exchange.attrib("__modelbindcache__");
+            if(cache == null) {
+                cache = new HashMap<>();
+                exchange.attrib("__modelbindcache__", cache);
+            }
+            if(!cache.containsKey(repo.getInfo().getModelClass()))
+                cache.put(repo.getInfo().getModelClass(), new HashMap<>());
+            Map<Object, Object> modelCache = cache.get(repo.getInfo().getModelClass());
+            Object model = modelCache.get(source);
+            if(model == null) {
+                model = repo.accessible(accessorAttribName == null ? null : exchange.attrib(accessorAttribName)).where(fieldName, source).first();
+                modelCache.put(source, model);
+            }
+            return model;
+        };
         for (Class<? extends Model> model : ORM.getModels()) {
             ModelBind[] binds = model.getDeclaredAnnotationsByType(ModelBind.class);
             if (binds.length == 0)
