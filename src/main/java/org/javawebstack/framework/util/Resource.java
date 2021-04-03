@@ -7,23 +7,23 @@ public interface Resource<T> {
 
     void map(T source, Context context);
 
-    static <T> Resource<T> make(Class<? extends Resource<T>> type, T source) {
+    static <T, R extends Resource<T>> R make(Class<R> type, T source) {
         return make(type, new Context(), source);
     }
 
-    static <T> List<Resource<T>> make(Class<? extends Resource<T>> type, List<T> source) {
+    static <T, R extends Resource<T>> List<R> make(Class<R> type, List<T> source) {
         return make(type, new Context(), source);
     }
 
-    static <T> List<Resource<T>> make(Class<? extends Resource<T>> type, T... source) {
+    static <T, R extends Resource<T>> List<R> make(Class<R> type, T... source) {
         return make(type, new Context(), source);
     }
 
-    static <T> Resource<T> make(Class<? extends Resource<T>> type, Context context, T source) {
+    static <T, R extends Resource<T>> R make(Class<R> type, Context context, T source) {
         if (source == null)
             return null;
         try {
-            Resource<T> resource = type.newInstance();
+            R resource = type.newInstance();
             resource.map(source, context);
             return resource;
         } catch (InstantiationException | IllegalAccessException e) {
@@ -31,11 +31,11 @@ public interface Resource<T> {
         }
     }
 
-    static <T> List<Resource<T>> make(Class<? extends Resource<T>> type, Context context, List<T> source) {
+    static <T, R extends Resource<T>> List<R> make(Class<R> type, Context context, List<T> source) {
         return source.stream().map(s -> make(type, context, s)).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    static <T> List<Resource<T>> make(Class<? extends Resource<T>> type, Context context, T... source) {
+    static <T, R extends Resource<T>> List<R> make(Class<R> type, Context context, T... source) {
         return make(type, context, Arrays.asList(source));
     }
 
