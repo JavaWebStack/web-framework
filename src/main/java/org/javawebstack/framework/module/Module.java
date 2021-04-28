@@ -1,6 +1,5 @@
 package org.javawebstack.framework.module;
 
-import org.javawebstack.command.CommandSystem;
 import org.javawebstack.framework.WebApplication;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.httpserver.HTTPServer;
