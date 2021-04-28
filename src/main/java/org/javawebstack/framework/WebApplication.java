@@ -2,19 +2,8 @@ package org.javawebstack.framework;
 
 import com.github.javafaker.Faker;
 import org.javawebstack.abstractdata.AbstractElement;
-import org.javawebstack.command.CommandSystem;
-import org.javawebstack.command.MultiCommand;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
-import org.javawebstack.framework.command.ShellCommand;
-import org.javawebstack.framework.command.StartCommand;
-import org.javawebstack.framework.command.crypto.DecryptCommand;
-import org.javawebstack.framework.command.crypto.EncryptCommand;
-import org.javawebstack.framework.command.crypto.GenerateKeyCommand;
-import org.javawebstack.framework.command.crypto.HashCommand;
-import org.javawebstack.framework.command.db.MigrateCommand;
-import org.javawebstack.framework.command.db.SeedCommand;
-import org.javawebstack.framework.command.schedule.WorkCommand;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.seed.AllSeeder;
@@ -24,23 +13,10 @@ import org.javawebstack.framework.util.*;
 import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.injector.Injector;
 import org.javawebstack.injector.SimpleInjector;
-import org.javawebstack.orm.ORM;
-import org.javawebstack.orm.Repo;
 import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLDriverFactory;
 import org.javawebstack.orm.wrapper.SQLDriverNotFoundException;
-import org.javawebstack.scheduler.job.JobQueue;
-import org.javawebstack.scheduler.job.local.LocalJobQueue;
-import org.javawebstack.scheduler.job.redis.RedisJobQueue;
-import org.javawebstack.scheduler.job.sql.SQLJobModel;
-import org.javawebstack.scheduler.job.sql.SQLJobQueue;
-import org.javawebstack.scheduler.scheduler.Schedule;
-import org.javawebstack.scheduler.scheduler.local.LocalSchedule;
-import org.javawebstack.scheduler.scheduler.redis.RedisSchedule;
-import org.javawebstack.scheduler.scheduler.sql.SQLSchedule;
-import org.javawebstack.scheduler.scheduler.sql.SQLScheduledTaskModel;
-import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.*;
@@ -57,11 +33,8 @@ public abstract class WebApplication {
     private final Crypt crypt;
     private final List<Module> modules = new ArrayList<>();
     private final ModelBindParamTransformer modelBindParamTransformer;
-    private final CommandSystem commandSystem = new CommandSystem();
     private final Map<String, Seeder> seeders = new HashMap<>();
     private final I18N translation = new I18N();
-    private JobQueue jobQueue;
-    private Schedule schedule;
     private SQLDriverFactory sqlDriverFactory;
 
     public WebApplication() {
@@ -71,9 +44,7 @@ public abstract class WebApplication {
         injector.setInstance(Config.class, config);
         injector.setInstance((Class<WebApplication>) getClass(), this);
         injector.setInstance(WebApplication.class, this);
-        injector.setInstance(CommandSystem.class, commandSystem);
         injector.setInstance(I18N.class, translation);
-        commandSystem.setInjector(injector);
 
         setupModules();
         modules.forEach(m -> m.beforeSetupConfig(this, config));
@@ -112,32 +83,6 @@ public abstract class WebApplication {
         setupInjection(injector);
         modules.forEach(m -> m.setupInjection(this, injector));
 
-        jobQueue = new LocalJobQueue();
-        schedule = new LocalSchedule();
-
-        if (config.get("scheduler.driver") != null) {
-            switch (config.get("scheduler.driver")) {
-                case "DATABASE":
-
-                    try {
-                        ORM.register(SQLJobModel.class, sql).autoMigrate();
-                        ORM.register(SQLScheduledTaskModel.class, sql).autoMigrate();
-                    } catch (ORMConfigurationException e) {
-                        e.printStackTrace();
-                    }
-                    jobQueue = new SQLJobQueue(sql, config.get("scheduler.jobs.name", "default"));
-                    schedule = new SQLSchedule(sql, config.get("scheduler.jobs.name", "default"));
-                    break;
-                case "REDIS":
-                    jobQueue = new RedisJobQueue(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
-                    schedule = new RedisSchedule(new Jedis(config.get("redis.host", "localhost"), config.getInt("redis.port", 6379)), config.get("schedule.jobs.name", "default"));
-                    break;
-            }
-        }
-
-        injector.setInstance(JobQueue.class, jobQueue);
-        injector.setInstance(Schedule.class, schedule);
-
         server = new HTTPServer()
                 .port(config.getInt("http.server.port", 80));
         injector.setInstance(HTTPServer.class, server);
@@ -157,26 +102,6 @@ public abstract class WebApplication {
         setupSeeding();
         modules.forEach(m -> m.setupSeeding(this));
         addSeeder("all", new AllSeeder());
-
-        setupCommands(commandSystem);
-        modules.forEach(m -> m.setupCommands(this, commandSystem));
-        commandSystem.addCommand("start", new StartCommand());
-        commandSystem.addCommand("sh", new ShellCommand());
-        commandSystem.addCommand("db", new MultiCommand()
-                .add("migrate", new MigrateCommand())
-                .add("seed", new SeedCommand())
-        );
-        commandSystem.addCommand("crypt", new MultiCommand()
-                .add("encrypt", new EncryptCommand())
-                .add("decrypt", new DecryptCommand())
-                .add("hash", new HashCommand())
-        );
-        commandSystem.addCommand("generate", new MultiCommand()
-                .add("key", new GenerateKeyCommand())
-        );
-        commandSystem.addCommand("schedule", new MultiCommand()
-                .add("work", new WorkCommand())
-        );
     }
 
     public Map<String, Seeder> getSeeders() {
@@ -263,10 +188,6 @@ public abstract class WebApplication {
         return translation;
     }
 
-    public CommandSystem getCommandSystem() {
-        return commandSystem;
-    }
-
     protected void setupModules() {
     }
 
@@ -281,18 +202,6 @@ public abstract class WebApplication {
     protected abstract void setupModels(SQL sql) throws ORMConfigurationException;
 
     protected abstract void setupServer(HTTPServer server);
-
-    protected abstract void setupCommands(CommandSystem system);
-
-    public void run(String[] args) {
-        if (args == null)
-            args = new String[]{"start"};
-        try {
-            commandSystem.run(args);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
 
     public void start() {
         server.start();

@@ -41,9 +41,6 @@ public interface Module {
     default void setupServer(WebApplication application, HTTPServer server) {
     }
 
-    default void setupCommands(WebApplication application, CommandSystem system) {
-    }
-
     default void setupSeeding(WebApplication application) {
     }
 
