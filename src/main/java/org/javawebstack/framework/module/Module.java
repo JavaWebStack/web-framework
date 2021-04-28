@@ -13,9 +13,6 @@ public interface Module {
     default void beforeSetupConfig(WebApplication application, Config config) {
     }
 
-    default void beforeSetupInjection(WebApplication application, Injector injector) {
-    }
-
     default void beforeSetupModels(WebApplication application, SQL sql) throws ORMConfigurationException {
     }
 
@@ -26,9 +23,6 @@ public interface Module {
     }
 
     default void setupConfig(WebApplication application, Config config) {
-    }
-
-    default void setupInjection(WebApplication application, Injector injector) {
     }
 
     default void setupDriverFactory(WebApplication application, SQLDriverFactory driverFactory) {

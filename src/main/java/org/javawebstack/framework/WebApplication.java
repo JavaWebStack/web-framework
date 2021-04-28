@@ -27,7 +27,6 @@ public abstract class WebApplication {
     private Logger logger = Logger.getLogger("WebApp");
     private SQL sql;
     private final HTTPServer server;
-    private final Injector injector;
     private final Faker faker = new Faker();
     private final Config config = new Config();
     private final Crypt crypt;
@@ -38,20 +37,12 @@ public abstract class WebApplication {
     private SQLDriverFactory sqlDriverFactory;
 
     public WebApplication() {
-        injector = new SimpleInjector();
-        injector.setInstance(Injector.class, injector);
-        injector.setInstance(Faker.class, faker);
-        injector.setInstance(Config.class, config);
-        injector.setInstance((Class<WebApplication>) getClass(), this);
-        injector.setInstance(WebApplication.class, this);
-        injector.setInstance(I18N.class, translation);
 
         setupModules();
         modules.forEach(m -> m.beforeSetupConfig(this, config));
         setupConfig(config);
 
         crypt = new Crypt(config.has("crypt.key") ? config.get("crypt.key") : Crypt.generateKey());
-        injector.setInstance(Crypt.class, crypt);
 
         modules.forEach(m -> m.setupConfig(this, config));
         sqlDriverFactory = new SQLDriverFactory(new HashMap<String, String>() {{
@@ -79,15 +70,8 @@ public abstract class WebApplication {
         }
         modelBindParamTransformer = new ModelBindParamTransformer();
 
-        modules.forEach(m -> m.beforeSetupInjection(this, injector));
-        setupInjection(injector);
-        modules.forEach(m -> m.setupInjection(this, injector));
-
         server = new HTTPServer()
                 .port(config.getInt("http.server.port", 80));
-        injector.setInstance(HTTPServer.class, server);
-        server.injector(injector);
-        injector.inject(this);
         server.beforeInterceptor(new CORSPolicy(config.get("http.server.cors", "*")));
         server.beforeInterceptor(new MultipartPolicy(config.get("http.server.tmp", null)));
         if (config.isEnabled("http.server.autoserialization", true))
@@ -143,8 +127,6 @@ public abstract class WebApplication {
     public void addSeeder(String name, Seeder... seeder) {
         if (seeder.length == 0)
             return;
-        for (Seeder seed : seeder)
-            injector.inject(seed);
         if (seeder.length > 1) {
             addSeeder(name, new MergedSeeder(seeder));
             return;
@@ -168,10 +150,6 @@ public abstract class WebApplication {
         return server;
     }
 
-    public Injector getInjector() {
-        return injector;
-    }
-
     public Faker getFaker() {
         return faker;
     }
@@ -192,9 +170,6 @@ public abstract class WebApplication {
     }
 
     protected abstract void setupConfig(Config config);
-
-    protected void setupInjection(Injector injector) {
-    }
 
     protected void setupSeeding() {
     }
