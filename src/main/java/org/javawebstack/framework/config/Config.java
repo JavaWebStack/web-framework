@@ -2,8 +2,9 @@ package org.javawebstack.framework.config;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import org.javawebstack.framework.util.IO;
-import org.javawebstack.framework.util.Json;
+import org.javawebstack.abstractdata.AbstractElement;
+import org.javawebstack.framework.utils.Json;
+import org.javawebstack.webutils.IO;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +73,10 @@ public class Config {
         }
     }
 
+    private void add(String path, AbstractElement readJsonFile) {
+        add(path, readJsonFile.toJson());
+    }
+
     public void addJsonFile(String path, String fileName) {
         addJsonFile(path, new File(fileName));
     }
@@ -81,6 +86,10 @@ public class Config {
             add(IO.readJsonFile(file));
         } catch (IOException ignored) {
         }
+    }
+
+    private void add(AbstractElement readJsonFile) {
+        add(readJsonFile.toJson());
     }
 
     public void addJsonFile(String fileName) {

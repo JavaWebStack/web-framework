@@ -9,14 +9,13 @@ import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.seed.AllSeeder;
 import org.javawebstack.framework.seed.MergedSeeder;
 import org.javawebstack.framework.seed.Seeder;
-import org.javawebstack.framework.util.*;
 import org.javawebstack.httpserver.HTTPServer;
-import org.javawebstack.injector.Injector;
-import org.javawebstack.injector.SimpleInjector;
 import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLDriverFactory;
 import org.javawebstack.orm.wrapper.SQLDriverNotFoundException;
+import org.javawebstack.webutils.*;
+import org.javawebstack.webutils.crypt.Crypt;
 
 import java.io.IOException;
 import java.util.*;
@@ -98,9 +97,9 @@ public abstract class WebApplication {
         try {
             AbstractElement element = AbstractElement.fromJson(IO.readTextResource(classLoader, resource));
             if (element.isObject())
-                translation.add(locale, element.object());
+                translation.set(locale, new Translation(element.object()));
             if (element.isArray())
-                translation.add(locale, element.array());
+                translation.set(locale, new Translation(element.object()));
         } catch (IOException ignored) {
         }
     }
