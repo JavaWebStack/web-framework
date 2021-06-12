@@ -4,6 +4,8 @@ import com.github.javafaker.Faker;
 import org.javawebstack.abstractdata.AbstractElement;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
+import org.javawebstack.framework.commands.HelpCommand;
+import org.javawebstack.framework.commands.StartWebServerCommand;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.seed.AllSeeder;
@@ -16,9 +18,13 @@ import org.javawebstack.orm.wrapper.SQLDriverFactory;
 import org.javawebstack.orm.wrapper.SQLDriverNotFoundException;
 import org.javawebstack.webutils.*;
 import org.javawebstack.webutils.crypt.Crypt;
+import picocli.CommandLine;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 public abstract class WebApplication {
@@ -36,11 +42,9 @@ public abstract class WebApplication {
     private SQLDriverFactory sqlDriverFactory;
 
     public WebApplication() {
-
         setupModules();
         modules.forEach(m -> m.beforeSetupConfig(this, config));
         setupConfig(config);
-
         crypt = new Crypt(config.has("crypt.key") ? config.get("crypt.key") : Crypt.generateKey());
 
         modules.forEach(m -> m.setupConfig(this, config));
@@ -165,17 +169,28 @@ public abstract class WebApplication {
         return translation;
     }
 
-    protected void setupModules() {
-    }
+    protected void setupModules() { }
 
     protected abstract void setupConfig(Config config);
 
-    protected void setupSeeding() {
-    }
+    protected void setupSeeding() { }
+
+    void setupCommands(CommandLine commandLine) { }
 
     protected abstract void setupModels(SQL sql) throws ORMConfigurationException;
 
     protected abstract void setupServer(HTTPServer server);
+
+    public void run(String[] args){
+        HelpCommand help  = new HelpCommand();
+
+        CommandLine commandLine = new CommandLine(help);
+        help.setCommandLine(commandLine);
+        commandLine.addSubcommand(new StartWebServerCommand(this));
+        setupCommands(commandLine);
+
+        commandLine.execute(args);
+    }
 
     public void start() {
         server.start();
