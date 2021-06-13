@@ -6,6 +6,7 @@ import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLDriverFactory;
+import picocli.CommandLine;
 
 public interface Module {
 
@@ -35,5 +36,7 @@ public interface Module {
 
     default void setupSeeding(WebApplication application) {
     }
+
+    default void setupCommands(WebApplication application, CommandLine commandLine) { }
 
 }

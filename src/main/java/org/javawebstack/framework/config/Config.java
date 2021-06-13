@@ -167,7 +167,7 @@ public class Config {
             IO.readPropertyFile(file).forEach((key, value) -> set(path, transformEnvKey(key.toString()), value.toString()));
         } catch (IOException ignored) {
         }
-        System.getenv().entrySet().forEach(e -> set(path, transformEnvKey(e.getKey()), e.getValue()));
+        System.getenv().forEach((key, value) -> set(path, transformEnvKey(key), value));
     }
 
     public void addEnvFile(File file) {

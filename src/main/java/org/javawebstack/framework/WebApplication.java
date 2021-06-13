@@ -75,6 +75,7 @@ public abstract class WebApplication {
 
         server = new HTTPServer()
                 .port(config.getInt("http.server.port", 80));
+
         server.beforeInterceptor(new CORSPolicy(config.get("http.server.cors", "*")));
         server.beforeInterceptor(new MultipartPolicy(config.get("http.server.tmp", null)));
         if (config.isEnabled("http.server.autoserialization", true))
@@ -187,6 +188,7 @@ public abstract class WebApplication {
         CommandLine commandLine = new CommandLine(help);
         help.setCommandLine(commandLine);
         commandLine.addSubcommand(new StartWebServerCommand(this));
+        modules.forEach(module -> module.setupCommands(this, commandLine));
         setupCommands(commandLine);
 
         commandLine.execute(args);
