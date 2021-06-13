@@ -16,9 +16,6 @@ The Web Framework combines multiple JavaWebStack libraries with glue code and he
 ## Quick Example
 
 ```java
-
-import org.javawebstack.httpserver.router.annotation.Body;
-
 class MyWebApp extends WebApplication {
 
     protected void setupConfig(Config config) {
