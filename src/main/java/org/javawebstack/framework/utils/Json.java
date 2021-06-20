@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 
 import java.util.HashMap;
 import java.util.Map;
+
 public class Json {
 
     public static Map<String, String> toKeyValueMap(JsonElement element) {

@@ -18,15 +18,15 @@ public class ModelBindParamTransformer extends DefaultRouteParamTransformer {
         super();
         this.transformer = (exchange, repo, fieldName, source) -> {
             Map<Class<? extends Model>, Map<Object, Object>> cache = exchange.attrib("__modelbindcache__");
-            if(cache == null) {
+            if (cache == null) {
                 cache = new HashMap<>();
                 exchange.attrib("__modelbindcache__", cache);
             }
-            if(!cache.containsKey(repo.getInfo().getModelClass()))
+            if (!cache.containsKey(repo.getInfo().getModelClass()))
                 cache.put(repo.getInfo().getModelClass(), new HashMap<>());
             Map<Object, Object> modelCache = cache.get(repo.getInfo().getModelClass());
             Object model = modelCache.get(source);
-            if(model == null) {
+            if (model == null) {
                 model = repo.accessible(accessorAttribName == null ? null : exchange.attrib(accessorAttribName)).where(fieldName, source).first();
                 modelCache.put(source, model);
             }

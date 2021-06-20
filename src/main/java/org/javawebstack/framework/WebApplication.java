@@ -4,7 +4,9 @@ import com.github.javafaker.Faker;
 import org.javawebstack.abstractdata.AbstractElement;
 import org.javawebstack.framework.bind.ModelBindParamTransformer;
 import org.javawebstack.framework.bind.ModelBindTransformer;
+import org.javawebstack.framework.commands.AutoMigrateCommand;
 import org.javawebstack.framework.commands.HelpCommand;
+import org.javawebstack.framework.commands.SeedCommand;
 import org.javawebstack.framework.commands.StartWebServerCommand;
 import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
@@ -21,10 +23,7 @@ import org.javawebstack.webutils.crypt.Crypt;
 import picocli.CommandLine;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 public abstract class WebApplication {
@@ -170,24 +169,30 @@ public abstract class WebApplication {
         return translation;
     }
 
-    protected void setupModules() { }
+    protected void setupModules() {
+    }
 
     protected abstract void setupConfig(Config config);
 
-    protected void setupSeeding() { }
+    protected void setupSeeding() {
+    }
 
-    void setupCommands(CommandLine commandLine) { }
+    void setupCommands(CommandLine commandLine) {
+    }
 
     protected abstract void setupModels(SQL sql) throws ORMConfigurationException;
 
     protected abstract void setupServer(HTTPServer server);
 
-    public void run(String[] args){
-        HelpCommand help  = new HelpCommand();
+    public void run(String[] args) {
+        HelpCommand help = new HelpCommand();
 
         CommandLine commandLine = new CommandLine(help);
         help.setCommandLine(commandLine);
         commandLine.addSubcommand(new StartWebServerCommand(this));
+        commandLine.addSubcommand(new SeedCommand(this));
+        commandLine.addSubcommand(new AutoMigrateCommand(this));
+
         modules.forEach(module -> module.setupCommands(this, commandLine));
         setupCommands(commandLine);
 

@@ -1,7 +1,7 @@
 package org.javawebstack.framework.commands;
 
 import org.javawebstack.framework.WebApplication;
-import picocli.CommandLine.*;
+import picocli.CommandLine.Command;
 
 import java.util.concurrent.Callable;
 
@@ -9,16 +9,9 @@ import java.util.concurrent.Callable;
 public class StartWebServerCommand implements Callable<Integer> {
     private WebApplication webApplication;
 
-    /*@Option(names = {"--port", "-p"}, description = "Port")
-    private int port;*/
 
-    public StartWebServerCommand(WebApplication webApplication){
+    public StartWebServerCommand(WebApplication webApplication) {
         this.webApplication = webApplication;
-    }
-
-    @Command(name = "test")
-    public void asd(){
-
     }
 
     public Integer call() {

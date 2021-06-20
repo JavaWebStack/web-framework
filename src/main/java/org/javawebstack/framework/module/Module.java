@@ -37,6 +37,7 @@ public interface Module {
     default void setupSeeding(WebApplication application) {
     }
 
-    default void setupCommands(WebApplication application, CommandLine commandLine) { }
+    default void setupCommands(WebApplication application, CommandLine commandLine) {
+    }
 
 }

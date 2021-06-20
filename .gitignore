@@ -4,3 +4,6 @@ target
 
 # IntelliJ Linux bug
 .fuse_*
+
+
+localtest.java

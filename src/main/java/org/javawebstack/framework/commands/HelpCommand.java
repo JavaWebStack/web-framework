@@ -15,12 +15,12 @@ public class HelpCommand implements Callable<Integer> {
         this.commandLine = commandLine;
     }
 
-    public HelpCommand(){
+    public HelpCommand() {
     }
 
-    private void printCommands(CommandLine.Help help, int indent){
-        System.out.println(String.join("",Collections.nCopies(indent, " ")) +help.commandList());
-        help.subcommands().forEach((n, h) -> printCommands(h, indent+4));
+    private void printCommands(CommandLine.Help help, int indent) {
+        System.out.println(String.join("", Collections.nCopies(indent, " ")) + help.commandList());
+        help.subcommands().forEach((n, h) -> printCommands(h, indent + 4));
     }
 
     public Integer call() {

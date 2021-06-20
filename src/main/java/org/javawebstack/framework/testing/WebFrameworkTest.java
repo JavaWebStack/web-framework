@@ -8,7 +8,7 @@ public abstract class WebFrameworkTest extends HTTPTest {
 
     private WebApplication webApplication;
 
-    public WebFrameworkTest(WebApplication webApplication){
+    public WebFrameworkTest(WebApplication webApplication) {
         super(webApplication.getServer());
 
         this.webApplication = webApplication;
@@ -18,11 +18,11 @@ public abstract class WebFrameworkTest extends HTTPTest {
         return webApplication;
     }
 
-    public void seed(String name){
+    public void seed(String name) {
         webApplication.getSeeder(name).seed();
     }
 
-    public Config getConfig(){
+    public Config getConfig() {
         return webApplication.getConfig();
     }
 }
