@@ -6,7 +6,7 @@
 
     <groupId>org.javawebstack</groupId>
     <artifactId>Web-Framework</artifactId>
-    <version>${project.newVersion}</version>
+    <version>${newVersion}</version>
 
     <repositories>
         <repository>
