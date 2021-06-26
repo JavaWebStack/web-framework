@@ -10,9 +10,9 @@ jobs:
         with:
           java-version: 1.8
       - name: Build
-        run: mvn -B package --file pom.xml
+        run: mvn -DnewVersion=1.0-SNAPSHOT -B package --file pom.xml
       - name: Deploy to JavaWebStack Repository
-        run: mvn deploy -s build/settings.xml
+        run: mvn deploy -DnewVersion=1.0-SNAPSHOT -s build/settings.xml
         env:
           DEPLOYMENT_USERNAME: ${{ secrets.DEPLOYMENT_USERNAME }}
           DEPLOYMENT_PASSWORD: ${{ secrets.DEPLOYMENT_PASSWORD }}
