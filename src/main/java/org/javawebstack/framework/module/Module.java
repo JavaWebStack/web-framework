@@ -1,11 +1,11 @@
 package org.javawebstack.framework.module;
 
 import org.javawebstack.framework.WebApplication;
-import org.javawebstack.framework.config.Config;
 import org.javawebstack.httpserver.HTTPServer;
 import org.javawebstack.orm.exception.ORMConfigurationException;
 import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLDriverFactory;
+import org.javawebstack.webutils.config.Config;
 import picocli.CommandLine;
 
 public interface Module {

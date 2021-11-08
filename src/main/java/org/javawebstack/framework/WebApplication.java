@@ -2,13 +2,10 @@ package org.javawebstack.framework;
 
 import com.github.javafaker.Faker;
 import org.javawebstack.abstractdata.AbstractElement;
-import org.javawebstack.framework.bind.ModelBindParamTransformer;
-import org.javawebstack.framework.bind.ModelBindTransformer;
 import org.javawebstack.framework.commands.AutoMigrateCommand;
 import org.javawebstack.framework.commands.HelpCommand;
 import org.javawebstack.framework.commands.SeedCommand;
 import org.javawebstack.framework.commands.StartWebServerCommand;
-import org.javawebstack.framework.config.Config;
 import org.javawebstack.framework.module.Module;
 import org.javawebstack.framework.seed.AllSeeder;
 import org.javawebstack.framework.seed.MergedSeeder;
@@ -19,7 +16,14 @@ import org.javawebstack.orm.wrapper.SQL;
 import org.javawebstack.orm.wrapper.SQLDriverFactory;
 import org.javawebstack.orm.wrapper.SQLDriverNotFoundException;
 import org.javawebstack.webutils.*;
+import org.javawebstack.webutils.config.Config;
 import org.javawebstack.webutils.crypt.Crypt;
+import org.javawebstack.webutils.middleware.CORSPolicy;
+import org.javawebstack.webutils.middleware.MultipartPolicy;
+import org.javawebstack.webutils.middleware.SerializedResponseTransformer;
+import org.javawebstack.webutils.modelbind.ModelBindParamTransformer;
+import org.javawebstack.webutils.modelbind.ModelBindTransformer;
+import org.javawebstack.webutils.util.IO;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -55,6 +59,7 @@ public abstract class WebApplication {
             put("user", config.get("database.user", "root"));
             put("password", config.get("database.password", ""));
         }});
+
         modules.forEach(m -> m.setupDriverFactory(this, sqlDriverFactory));
         String driverName = config.get("database.driver", "none");
         try {

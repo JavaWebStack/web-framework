@@ -1,8 +1,8 @@
 package org.javawebstack.framework.testing;
 
 import org.javawebstack.framework.WebApplication;
-import org.javawebstack.framework.config.Config;
 import org.javawebstack.httpserver.test.HTTPTest;
+import org.javawebstack.webutils.config.Config;
 
 public abstract class WebFrameworkTest extends HTTPTest {
 
